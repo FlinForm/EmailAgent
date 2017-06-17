@@ -18,6 +18,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 
+import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 
 import com.google.api.services.gmail.model.*;
@@ -36,7 +37,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
 
@@ -53,8 +56,9 @@ public class MainActivity extends AppCompatActivity
         implements EasyPermissions.PermissionCallbacks {
     private static GoogleAccountCredential credential;
     private TextView textView;
-    private View apiButton, testButton;
+    private View apiButton;
     private ProgressDialog mProgress;
+    public Toolbar toolBar;
 
     private List messages;
     private GmailApiHelper gmailApiHelper = new GmailApiHelper();
@@ -77,11 +81,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        toolBar = (Toolbar) findViewById(R.id.toolbar);
+        toolBar.inflateMenu(R.menu.new_email_tmenu);
+        setSupportActionBar(toolBar);
+
         // Initialize credentials and service object.
         credential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
-        System.out.println(credential.getSelectedAccountName());
 
         textView = (TextView) findViewById(R.id.textView);
 
@@ -89,7 +96,7 @@ public class MainActivity extends AppCompatActivity
         apiButton.setOnClickListener(event -> getResultsFromApi());
 
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Calling Gmail API ...");
+        mProgress.setMessage(getString(R.string.calling_api));
 
         View fab = findViewById(R.id.fab);
         fab.setOnClickListener(event -> {
@@ -98,15 +105,12 @@ public class MainActivity extends AppCompatActivity
             transaction.commit();
         });
 
-        testButton = findViewById(R.id.testApi);
-        testButton.setOnClickListener(event -> {
-            try {
-                 messages = new RequestHandler(new GmailApiRequests(),
-                        credential, null, null).execute(RequestType.GET_DRAFTS).get();
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
     }
 
     private void getResultsFromApi() {
@@ -115,22 +119,12 @@ public class MainActivity extends AppCompatActivity
         } else if (credential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (!isDeviceOnline()) {
-            textView.setText("No network connection available.");
+            textView.setText(R.string.no_connection);
         } else {
             new MakeRequestTask(credential).execute();
         }
     }
 
-    /**
-     * Attempts to set the account used with the API credentials. If an account
-     * name was previously saved it will use that one; otherwise an account
-     * picker dialog will be shown to the user. Note that the setting the
-     * account to use with the credentials object requires the app to have the
-     * GET_ACCOUNTS permission, which is requested here if it is not already
-     * present. The AfterPermissionGranted annotation indicates that this
-     * function will be rerun automatically whenever the GET_ACCOUNTS permission
-     * is granted.
-     */
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
@@ -156,16 +150,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Called when an activity launched here (specifically, AccountPicker
-     * and authorization) exits, giving you the requestCode you started it with,
-     * the resultCode it returned, and any additional data from it.
-     * @param requestCode code indicating which activity result is incoming.
-     * @param resultCode code indicating the result of the incoming
-     *     activity result.
-     * @param data Intent (containing result data) returned by incoming
-     *     activity result.
-     */
     @Override
     protected void onActivityResult(
             int requestCode, int resultCode, Intent data) {
@@ -204,14 +188,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Respond to requests for permissions at runtime for API 23 and above.
-     * @param requestCode The request code passed in
-     *     requestPermissions(android.app.Activity, String, int, String[])
-     * @param permissions The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *     which is either PERMISSION_GRANTED or PERMISSION_DENIED. Never null.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -274,17 +250,13 @@ public class MainActivity extends AppCompatActivity
         MakeRequestTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new com.google.api.services.gmail.Gmail.Builder(
+            mService = new Gmail.Builder(
                     transport, jsonFactory, credential)
-                    .setApplicationName("Gmail API Android Quickstart")
+                    .setApplicationName(getString(R.string.quickstart_api))
                     .build();
             System.out.println(credential.getSelectedAccountName());
         }
 
-        /**
-         * Background task to call Gmail API.
-         * @param params no parameters needed for this task.
-         */
         @Override
         protected List<String> doInBackground(Void... params) {
             try {
@@ -296,11 +268,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        /**
-         * Fetch a list of Gmail labels attached to the specified account.
-         * @return List of Strings labels.
-         * @throws IOException
-         */
         private List<String> getDataFromApi() throws IOException {
             // Get the labels in the user's account.
             String user = "me";
@@ -324,9 +291,9 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(List<String> output) {
             mProgress.hide();
             if (output == null || output.size() == 0) {
-                textView.setText("No results returned.");
+                textView.setText(R.string.no_results);
             } else {
-                output.add(0, "Data retrieved using the Gmail API:");
+                output.add(0, getString(R.string.retrieve_data));
                 textView.setText(TextUtils.join("\n", output));
             }
         }
@@ -344,11 +311,11 @@ public class MainActivity extends AppCompatActivity
                             ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             MainActivity.REQUEST_AUTHORIZATION);
                 } else {
-                    textView.setText("The following error occurred:\n"
+                    textView.setText(getString(R.string.error_occured)
                             + mLastError.getMessage());
                 }
             } else {
-                textView.setText("RequestType cancelled.");
+                textView.setText(R.string.request_canceled);
             }
         }
     }

@@ -3,7 +3,11 @@ package com.epam.androidlab.emailagent.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -35,6 +39,9 @@ public class NewEmailFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        setHasOptionsMenu(true);
+        getActivity().invalidateOptionsMenu();
+
         credential = MainActivity.getCredential();
         isEmailSent = false;
 
@@ -47,6 +54,18 @@ public class NewEmailFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.new_email_tmenu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
     }
@@ -54,7 +73,7 @@ public class NewEmailFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (!isEmailSent) {
+        /*if (!isEmailSent) {
             MimeMessage mimeMessage = GmailApiHelper
                     .createNewEmailMessage(credential.getSelectedAccountName(),
                             receiver.getText().toString(),
@@ -62,7 +81,7 @@ public class NewEmailFragment extends Fragment {
                             emailBody.getText().toString());
             new RequestHandler(new GmailApiRequests(), credential, mimeMessage, null)
                     .execute(RequestType.MAKE_DRAFT);
-        }
+        }*/
     }
 
     private void sendNewEmail() {

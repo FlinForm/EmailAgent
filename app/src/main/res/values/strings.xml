@@ -4,4 +4,13 @@
     <string name="test_button">Test button %s</string>
     <string name="subject_text">SUBJECT:</string>
     <string name="receiver">RECEIVER:</string>
+    <string name="no_connection">No network connection available.</string>
+    <string name="calling_api">Calling Gmail API ...</string>
+    <string name="quickstart_api">Gmail API Android Quickstart</string>
+    <string name="retrieve_data">Data retrieved using the Gmail API:</string>
+    <string name="no_results">No results returned.</string>
+    <string name="request_canceled">RequestType cancelled.</string>
+    <string name="error_occured">The following error occurred:</string>
+    <string name="back_arrow_name">move back</string>
+    <string name="navigation_toolbar_item">navigation</string>
 </resources>

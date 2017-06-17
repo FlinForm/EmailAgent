@@ -4,37 +4,36 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar"/>
 
     <RelativeLayout
         android:id="@+id/fragmentLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-    </RelativeLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" />
 
     <Button
         android:id="@+id/apiButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="15dp"
         android:text="@string/api_button" />
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="400dp" />
-
-    <Button
-        android:id="@+id/testApi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/test_button" />
+        android:layout_height="350dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="15dp">
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp">
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -42,7 +41,10 @@
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp"
             android:clickable="true"
-            app:backgroundTint="@color/cardview_shadow_start_color" />
+            app:backgroundTint="@color/cardview_shadow_start_color"
+            app:fabSize="mini" />
     </RelativeLayout>
 </LinearLayout>
