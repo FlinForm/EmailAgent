@@ -35,12 +35,14 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -54,8 +56,10 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
         implements EasyPermissions.PermissionCallbacks {
+    private com.google.api.services.gmail.Gmail mService = null;
     private static GoogleAccountCredential credential;
     private TextView textView;
+    //private TextView navHeaderEmailAddress;
     private View apiButton;
     private ProgressDialog mProgress;
     public Toolbar toolBar;
@@ -82,13 +86,18 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         toolBar = (Toolbar) findViewById(R.id.toolbar);
+        toolBar.setTitle("");
         toolBar.inflateMenu(R.menu.new_email_tmenu);
         setSupportActionBar(toolBar);
+
+        NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
+        //view.setNavigationItemSelectedListener();
 
         // Initialize credentials and service object.
         credential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+        initGmailService();
 
         textView = (TextView) findViewById(R.id.textView);
 
@@ -101,10 +110,9 @@ public class MainActivity extends AppCompatActivity
         View fab = findViewById(R.id.fab);
         fab.setOnClickListener(event -> {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.fragmentLayout, new NewEmailFragment());
+            transaction.replace(R.id.fragmentLayout, new NewEmailFragment());
             transaction.commit();
         });
-
     }
 
     @Override
@@ -123,6 +131,15 @@ public class MainActivity extends AppCompatActivity
         } else {
             new MakeRequestTask(credential).execute();
         }
+    }
+
+    private void initGmailService() {
+        HttpTransport transport = AndroidHttp.newCompatibleTransport();
+        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        mService = new Gmail.Builder(
+                transport, jsonFactory, credential)
+                .setApplicationName(getString(R.string.quickstart_api))
+                .build();
     }
 
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
@@ -244,7 +261,6 @@ public class MainActivity extends AppCompatActivity
 
 
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
-        private com.google.api.services.gmail.Gmail mService = null;
         private Exception mLastError = null;
 
         MakeRequestTask(GoogleAccountCredential credential) {

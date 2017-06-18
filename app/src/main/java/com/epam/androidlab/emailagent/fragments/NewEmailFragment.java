@@ -2,8 +2,9 @@ package com.epam.androidlab.emailagent.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BaseTransientBottomBar;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,7 +51,7 @@ public class NewEmailFragment extends Fragment {
         emailBody = (EditText) view.findViewById(R.id.emailBody);
 
         View fab = view.findViewById(R.id.fabEmailFragment);
-        fab.setOnClickListener(event -> sendNewEmail());
+        fab.setOnClickListener(event -> sendNewEmail(view));
     }
 
     @Override
@@ -62,7 +63,15 @@ public class NewEmailFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.move_back:
+                // replace "remove method" call with replace InboxFragment
+                getFragmentManager().beginTransaction().remove(this).commit();
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 
     @Override
@@ -84,7 +93,16 @@ public class NewEmailFragment extends Fragment {
         }*/
     }
 
-    private void sendNewEmail() {
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println(1);
+    }
+
+    private void sendNewEmail(View view) {
+        if ("".equals(receiver.getText().toString())) {
+            Snackbar.make(view, "Enter email address!", BaseTransientBottomBar.LENGTH_LONG).show();
+        }
         if (GmailApiHelper.isDeviceOnline(getContext())) {
             MimeMessage mimeMessage = GmailApiHelper
                     .createNewEmailMessage(credential.getSelectedAccountName(),

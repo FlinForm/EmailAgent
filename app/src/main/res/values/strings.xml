@@ -13,4 +13,8 @@
     <string name="error_occured">The following error occurred:</string>
     <string name="back_arrow_name">move back</string>
     <string name="navigation_toolbar_item">navigation</string>
+    <string name="inbox_messages">Inbox messages</string>
+    <string name="outbox_messages">Outbox messages</string>
+    <string name="drafts">Drafts</string>
+    <string name="recycle">Recycle</string>
 </resources>
