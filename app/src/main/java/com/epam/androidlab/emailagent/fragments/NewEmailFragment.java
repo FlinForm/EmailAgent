@@ -63,15 +63,7 @@ public class NewEmailFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.move_back:
-                // replace "remove method" call with replace InboxFragment
-                getFragmentManager().beginTransaction().remove(this).commit();
-                break;
-            default:
-                break;
-        }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -109,7 +101,7 @@ public class NewEmailFragment extends Fragment {
                             receiver.getText().toString(),
                             subject.getText().toString(),
                             emailBody.getText().toString());
-            new RequestHandler(new GmailApiRequests(), credential, mimeMessage, null)
+            new RequestHandler(new GmailApiRequests(), credential, null, mimeMessage, null)
                     .execute(RequestType.SEND_EMAIL);
         }
         isEmailSent = true;

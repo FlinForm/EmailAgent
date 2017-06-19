@@ -1,7 +1,6 @@
 package com.epam.androidlab.emailagent.api;
 
 import com.google.api.client.util.Base64;
-import com.google.api.client.util.StringUtils;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.ListDraftsResponse;
@@ -19,20 +18,32 @@ import javax.mail.internet.MimeMessage;
 public class GmailApiRequests implements ApiRequests {
     //Finished
     @Override
-    public List<Message> getMessages(Gmail service, String userId) throws IOException {
+    public List<Message> getMessages(Gmail service, String userId, List<String> queries) throws IOException {
+        List<Message> messageReferences = new ArrayList<>();
         List<Message> messages = new ArrayList<>();
+
         ListMessagesResponse response = service.users()
                 .messages()
                 .list(userId)
+                .setLabelIds(queries)
                 .execute();
+
         while (response.getMessages() != null) {
-            messages.addAll(response.getMessages());
+            messageReferences.addAll(response.getMessages());
             if (response.getNextPageToken() != null) {
                 String pageToken = response.getNextPageToken();
-                response = service.users().messages().list(userId).setPageToken(pageToken).execute();
+                response = service.users()
+                        .messages()
+                        .list(userId)
+                        .setLabelIds(queries)
+                        .setPageToken(pageToken)
+                        .execute();
             } else {
                 break;
             }
+        }
+        for (Message message : messageReferences) {
+            messages.add(getMessageById(service, userId, message));
         }
         return messages;
     }

@@ -11,7 +11,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 public interface ApiRequests {
-    List<Message> getMessages(Gmail service, String userId) throws IOException;
+    List<Message> getMessages(Gmail service, String userId, List<String> queries) throws IOException;
 
     List<Draft> getDrafts(Gmail service, String userId) throws IOException;
 

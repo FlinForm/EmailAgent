@@ -2,10 +2,11 @@ package com.epam.androidlab.emailagent.activities;
 
 import com.epam.androidlab.emailagent.R;
 import com.epam.androidlab.emailagent.api.GmailApiHelper;
-import com.epam.androidlab.emailagent.api.GmailApiRequests;
-import com.epam.androidlab.emailagent.api.RequestType;
-import com.epam.androidlab.emailagent.api.RequestHandler;
+import com.epam.androidlab.emailagent.fragments.DraftsFragment;
+import com.epam.androidlab.emailagent.fragments.InboxFragment;
 import com.epam.androidlab.emailagent.fragments.NewEmailFragment;
+import com.epam.androidlab.emailagent.fragments.OutboxFragment;
+import com.epam.androidlab.emailagent.fragments.RecycleFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -36,11 +37,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,17 +63,14 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
-        implements EasyPermissions.PermissionCallbacks {
-    private com.google.api.services.gmail.Gmail mService = null;
-    private static GoogleAccountCredential credential;
-    private TextView textView;
-    //private TextView navHeaderEmailAddress;
-    private View apiButton;
-    private ProgressDialog mProgress;
-    public Toolbar toolBar;
+        implements EasyPermissions.PermissionCallbacks,
+        NavigationView.OnNavigationItemSelectedListener {
 
-    private List messages;
-    private GmailApiHelper gmailApiHelper = new GmailApiHelper();
+    private final String INBOX_FRAGMENT_TAG = "InboxFragment";
+    private final String OUTBOX_FRAGMENT_TAG = "OutboxFragment";
+    private final String DRAFTS_FRAGMENT_TAG = "DraftsFragment";
+    private final String RECYCLE_FRAGMENT_TAG = "RecycleFragment";
+    public final static String NEW_EMAIL_TAG = "NewEmailFragment";
 
     private static final int REQUEST_ACCOUNT_PICKER = 1000;
     private static final int REQUEST_AUTHORIZATION = 1001;
@@ -80,18 +85,30 @@ public class MainActivity extends AppCompatActivity
             GmailScopes.GMAIL_READONLY,
             GmailScopes.MAIL_GOOGLE_COM};
 
+    private FragmentTransaction transaction;
+    private DrawerLayout drawerLayout;
+    private com.google.api.services.gmail.Gmail mService = null;
+    private static GoogleAccountCredential credential;
+    private TextView textView;
+    //private TextView navHeaderEmailAddress;
+    private View apiButton;
+    private ProgressDialog mProgress;
+    public Toolbar toolBar;
+
+    private List<Message> messages;
+    private GmailApiHelper gmailApiHelper = new GmailApiHelper();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        transaction  = getSupportFragmentManager().beginTransaction();
+
         toolBar = (Toolbar) findViewById(R.id.toolbar);
         toolBar.setTitle("");
         toolBar.inflateMenu(R.menu.new_email_tmenu);
         setSupportActionBar(toolBar);
-
-        NavigationView view = (NavigationView) findViewById(R.id.navigation_view);
-        //view.setNavigationItemSelectedListener();
 
         // Initialize credentials and service object.
         credential = GoogleAccountCredential.usingOAuth2(
@@ -107,17 +124,75 @@ public class MainActivity extends AppCompatActivity
         mProgress = new ProgressDialog(this);
         mProgress.setMessage(getString(R.string.calling_api));
 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         View fab = findViewById(R.id.fab);
-        fab.setOnClickListener(event -> {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragmentLayout, new NewEmailFragment());
-            transaction.commit();
-        });
+        fab.setOnClickListener(event -> getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragmentLayout, new NewEmailFragment(), NEW_EMAIL_TAG)
+                .commit());
+    }
+
+    // Sometimes replacing fragments don't work.
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        transaction = getSupportFragmentManager().beginTransaction();
+        switch (item.getItemId()) {
+            case R.id.inbox_messages:
+                    transaction.add(R.id.fragmentLayout, new InboxFragment(), INBOX_FRAGMENT_TAG);
+                break;
+            case R.id.outbox_messages:
+                    transaction.add(R.id.fragmentLayout, new OutboxFragment(), OUTBOX_FRAGMENT_TAG);
+                break;
+            case R.id.drafts:
+                    transaction.add(R.id.fragmentLayout, new DraftsFragment(), DRAFTS_FRAGMENT_TAG);
+                break;
+            case R.id.recycle:
+                    transaction.add(R.id.fragmentLayout, new RecycleFragment(), RECYCLE_FRAGMENT_TAG);
+                break;
+        }
+        transaction.commit();
+        drawerLayout.closeDrawer(Gravity.START);
+        return true;
+    }
+
+    private boolean findAndReplaceFragment(String tag) {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if (fragment != null) {
+            System.out.println("t");
+            transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragmentLayout, fragment);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation:
+                if (drawerLayout.isDrawerOpen(Gravity.START)) {
+                    drawerLayout.closeDrawer(Gravity.START);
+                } else {
+                    drawerLayout.openDrawer(Gravity.START);
+                }
+                break;
+            case R.id.move_back:
+                getSupportFragmentManager().beginTransaction()
+                        .remove(getSupportFragmentManager().findFragmentByTag(NEW_EMAIL_TAG))
+                        .commit();
+                break;
+        }
         return true;
     }
 
