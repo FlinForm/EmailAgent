@@ -20,10 +20,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 public class GmailApiRequests implements ApiRequests {
-    private final String INBOX_QUERY = "INBOX";
-    private final String OUTBOX_QUERY = "SENT";
-    private final String DRAFTS_QUERY = "DRAFT";
-    private final String TRASH_QUERY = "TRASH";
 
     //Finished
     @Override
@@ -57,7 +53,12 @@ public class GmailApiRequests implements ApiRequests {
     throws IOException {
         int startPosition = messages.size();
         int endPosition = startPosition + 10;
+
         List<Message> messagesLinks = getListByQuery(query);
+        if (messagesLinks.size() == 0) {
+            return;
+        }
+
         BatchRequest batchRequest = service.batch();
         JsonBatchCallback<Message> callback = new JsonBatchCallback<Message>() {
             @Override
@@ -70,18 +71,15 @@ public class GmailApiRequests implements ApiRequests {
                 messages.add(message);
             }
         };
+
         for (int i = startPosition; i < endPosition; i++) {
             if (i > messagesLinks.size() - 1) {
                 break;
             }
-            System.out.println(i);
             Message message = messagesLinks.get(i);
             service.users().messages().get(userId, message.getId()).queue(batchRequest, callback);
         }
 
-        /*for (Message message : messagesLinks) {
-            service.users().messages().get(userId, message.getId()).queue(batchRequest, callback);
-        }*/
         batchRequest.execute();
     }
 
@@ -151,15 +149,17 @@ public class GmailApiRequests implements ApiRequests {
     }
 
     private List<Message> getListByQuery(String query) {
-        switch (query) {
-            case INBOX_QUERY:
+        switch (RequestType.valueOf(query)) {
+            case INBOX:
                 return Mailbox.getInboxMessages();
-            case OUTBOX_QUERY:
+            case SENT:
                 return Mailbox.getOutboxMessages();
-            case DRAFTS_QUERY:
+            case DRAFT:
                 return Mailbox.getDrafts();
-            case TRASH_QUERY:
+            case TRASH:
                 return Mailbox.getTrash();
+            case UNREAD:
+                return null;
         }
         return null;
     }

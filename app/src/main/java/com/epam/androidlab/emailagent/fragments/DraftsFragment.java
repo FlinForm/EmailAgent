@@ -61,7 +61,7 @@ public class DraftsFragment extends Fragment implements View.OnScrollChangeListe
                     progressDialog,
                     recyclerView,
                     null,
-                    null).execute(RequestType.MAKE_BATCH_REQUEST);
+                    null).execute(RequestType.MAKE_BATCH_REQUEST, RequestType.DRAFT);
         }
 
         View fab = view.findViewById(R.id.recycleFab);
@@ -79,6 +79,7 @@ public class DraftsFragment extends Fragment implements View.OnScrollChangeListe
         return super.onContextItemSelected(item);
     }
 
+    // !!!!!! FIX SCREEN ROTATION BUG !!!!!!!!!
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         if (drafts.size() < Mailbox.getDrafts().size()) {
@@ -89,13 +90,9 @@ public class DraftsFragment extends Fragment implements View.OnScrollChangeListe
                             progressDialog,
                             recyclerView,
                             null,
-                            null).execute(RequestType.MAKE_BATCH_REQUEST);
+                            null).execute(RequestType.MAKE_BATCH_REQUEST, RequestType.DRAFT);
                 }
             }
         }
-    }
-
-    private void removeFragment() {
-        getActivity().getSupportFragmentManager().beginTransaction().detach(this).commit();
     }
 }

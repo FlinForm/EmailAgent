@@ -17,10 +17,8 @@ import javax.mail.internet.MimeMessage;
 
 public class RequestHandler extends AsyncTask<RequestType, Void, Void> {
     private final String INBOX_QUERY = "INBOX";
-    private final String OUTBOX_QUERY = "SENT";
     private final String DRAFTS_QUERY = "DRAFT";
     private final String TRASH_QUERY = "TRASH";
-    private final String UNREAD_QUERY = "UNREAD";
 
     private final String myId;
     private final MimeMessage mimeMessage;
@@ -76,7 +74,7 @@ public class RequestHandler extends AsyncTask<RequestType, Void, Void> {
         }
         request = params[0];
         try {
-            handleRequest();
+            handleRequest(params);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (MessagingException e) {
@@ -86,25 +84,25 @@ public class RequestHandler extends AsyncTask<RequestType, Void, Void> {
     }
 
     private void getAllReferences() throws IOException {
-        queries.add(INBOX_QUERY);
+        queries.add(RequestType.INBOX.toString());
         apiRequests.getMessageReferences(service, myId, queries);
         queries.clear();
-        queries.add(DRAFTS_QUERY);
+        queries.add(RequestType.DRAFT.toString());
         apiRequests.getMessageReferences(service, myId, queries);
         queries.clear();
-        queries.add(OUTBOX_QUERY);
+        queries.add(RequestType.SENT.toString());
         apiRequests.getMessageReferences(service, myId, queries);
         queries.clear();
-        queries.add(TRASH_QUERY);
+        queries.add(RequestType.TRASH.toString());
         apiRequests.getMessageReferences(service, myId, queries);
         queries.clear();
-        /*queries.add(INBOX_QUERY);
+        /*queries.add(RequestType.UNREAD.toString());
         apiRequests.getMessageReferences(service, myId, queries);
         queries.clear();*/
     }
 
 
-    private void handleRequest() throws IOException, MessagingException {
+    private void handleRequest(RequestType... params) throws IOException, MessagingException {
         queries.clear();
         switch (request) {
             case GET_ALL_REFERENCES:
@@ -128,9 +126,10 @@ public class RequestHandler extends AsyncTask<RequestType, Void, Void> {
                 }
                 break;
             case MAKE_BATCH_REQUEST:
-                if (messages != null | messages.size() != 0) {
-                    apiRequests.batchRequest(service, myId, messages, DRAFTS_QUERY);
+                if (messages == null | params.length < 2) {
+                    return;
                 }
+                    apiRequests.batchRequest(service, myId, messages, params[1].toString());
             case MAKE_DRAFT:
                 if (mimeMessage != null) {
                     //apiRequests.makeDraft(service, myId, mimeMessage);

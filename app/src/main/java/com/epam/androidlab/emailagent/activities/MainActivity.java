@@ -1,6 +1,5 @@
 package com.epam.androidlab.emailagent.activities;
 
-import com.epam.androidlab.emailagent.Mailbox;
 import com.epam.androidlab.emailagent.R;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
@@ -23,8 +22,6 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 
-import com.google.api.services.gmail.model.*;
-
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
@@ -34,28 +31,22 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
-import java.io.IOException;
-import java.lang.Thread;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -87,7 +78,6 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawerLayout;
     private static com.google.api.services.gmail.Gmail gmailService = null;
     private static GoogleAccountCredential credential;
-    private TextView textView;
     private ProgressDialog mProgress;
     public Toolbar toolBar;
 
@@ -108,8 +98,6 @@ public class MainActivity extends AppCompatActivity
                 .setBackOff(new ExponentialBackOff());
 
         initGmailService();
-
-        textView = (TextView) findViewById(R.id.textView);
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage(getString(R.string.progress_dialog_message));
@@ -141,7 +129,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.drafts:
                     transaction.replace(R.id.fragmentLayout, new DraftsFragment(), DRAFTS_FRAGMENT_TAG);
-
                 break;
             case R.id.recycle:
                     transaction.replace(R.id.fragmentLayout, new RecycleFragment(), RECYCLE_FRAGMENT_TAG);
@@ -150,26 +137,6 @@ public class MainActivity extends AppCompatActivity
         drawerLayout.closeDrawer(Gravity.START);
         transaction.commit();
         return true;
-    }
-
-    private void checkDrawer() {
-        if (!drawerLayout.isDrawerOpen(Gravity.START)) {
-            transaction.commit();
-        } else {
-            checkDrawer();
-        }
-    }
-
-    private boolean findAndReplaceFragment(String tag) {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
-        if (fragment != null) {
-            System.out.println("t");
-            transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragmentLayout, fragment);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override
@@ -201,22 +168,18 @@ public class MainActivity extends AppCompatActivity
         return gmailService;
     }
 
-    public static void setGmailService(Gmail gmailService) {
-        MainActivity.gmailService = gmailService;
-    }
-
     private void getResultsFromApi() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (credential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (!isDeviceOnline()) {
-            textView.setText(R.string.no_connection);
+            Snackbar.make(getCurrentFocus(),
+                    getString(R.string.no_connection),
+                    BaseTransientBottomBar.LENGTH_LONG).show();
         } else {
-            //new MakeRequestTask().execute();
-
-                new RequestHandler(new GmailApiRequests(), null, mProgress, null, null, null)
-                        .execute(RequestType.GET_ALL_REFERENCES);
+            new RequestHandler(new GmailApiRequests(), null, mProgress, null, null, null)
+                    .execute(RequestType.GET_ALL_REFERENCES);
 
         }
     }
@@ -260,9 +223,9 @@ public class MainActivity extends AppCompatActivity
         switch(requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
-                    textView.setText(
-                            "This app requires Google Play Services. Please install " +
-                                    "Google Play Services on your device and relaunch this app.");
+                    Snackbar.make(getCurrentFocus(),
+                            R.string.no_services_found,
+                            BaseTransientBottomBar.LENGTH_LONG).show();
                 } else {
                     getResultsFromApi();
                 }
@@ -343,57 +306,6 @@ public class MainActivity extends AppCompatActivity
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
-    }
-
-
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
-
-        @Override
-        protected List<String> doInBackground(Void... params) {
-            try {
-                return getDataFromApi();
-            } catch (Exception e) {
-                cancel(true);
-                return null;
-            }
-        }
-
-        private List<String> getDataFromApi() throws IOException {
-            String user = "me";
-            List<String> labels = new ArrayList<>();
-            ListLabelsResponse listResponse =
-                    gmailService
-                            .users()
-                            .labels()
-                            .list(user)
-                            .execute();
-            ListMessagesResponse response = gmailService.users()
-                    .messages()
-                    .list(user)
-                    .execute();
-            for (Label label : listResponse.getLabels()) {
-                labels.add(label.getName());
-            }
-            return labels;
-        }
-
-
-        @Override
-        protected void onPreExecute() {
-            textView.setText("");
-            mProgress.show();
-        }
-
-        @Override
-        protected void onPostExecute(List<String> output) {
-            mProgress.hide();
-            if (output == null || output.size() == 0) {
-                textView.setText(R.string.no_results);
-            } else {
-                output.add(0, getString(R.string.retrieve_data));
-                textView.setText(TextUtils.join("\n", output));
-            }
-        }
     }
 
     public static GoogleAccountCredential getCredential() {
