@@ -88,12 +88,12 @@ public class NewEmailFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.out.println(1);
     }
 
     private void sendNewEmail(View view) {
         if ("".equals(receiver.getText().toString())) {
             Snackbar.make(view, "Enter email address!", BaseTransientBottomBar.LENGTH_LONG).show();
+            return;
         }
         if (GmailApiHelper.isDeviceOnline(getContext())) {
             MimeMessage mimeMessage = GmailApiHelper
@@ -101,7 +101,7 @@ public class NewEmailFragment extends Fragment {
                             receiver.getText().toString(),
                             subject.getText().toString(),
                             emailBody.getText().toString());
-            new RequestHandler(new GmailApiRequests(), credential, null, mimeMessage, null)
+            new RequestHandler(new GmailApiRequests(), null, null, null, mimeMessage, null)
                     .execute(RequestType.SEND_EMAIL);
         }
         isEmailSent = true;

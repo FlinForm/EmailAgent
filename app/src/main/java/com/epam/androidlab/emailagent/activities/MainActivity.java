@@ -1,7 +1,10 @@
 package com.epam.androidlab.emailagent.activities;
 
+import com.epam.androidlab.emailagent.Mailbox;
 import com.epam.androidlab.emailagent.R;
-import com.epam.androidlab.emailagent.api.GmailApiHelper;
+import com.epam.androidlab.emailagent.api.GmailApiRequests;
+import com.epam.androidlab.emailagent.api.RequestHandler;
+import com.epam.androidlab.emailagent.api.RequestType;
 import com.epam.androidlab.emailagent.fragments.DraftsFragment;
 import com.epam.androidlab.emailagent.fragments.InboxFragment;
 import com.epam.androidlab.emailagent.fragments.NewEmailFragment;
@@ -11,8 +14,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -39,21 +40,18 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,16 +85,11 @@ public class MainActivity extends AppCompatActivity
 
     private FragmentTransaction transaction;
     private DrawerLayout drawerLayout;
-    private com.google.api.services.gmail.Gmail mService = null;
+    private static com.google.api.services.gmail.Gmail gmailService = null;
     private static GoogleAccountCredential credential;
     private TextView textView;
-    //private TextView navHeaderEmailAddress;
-    private View apiButton;
     private ProgressDialog mProgress;
     public Toolbar toolBar;
-
-    private List<Message> messages;
-    private GmailApiHelper gmailApiHelper = new GmailApiHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,19 +103,18 @@ public class MainActivity extends AppCompatActivity
         toolBar.inflateMenu(R.menu.new_email_tmenu);
         setSupportActionBar(toolBar);
 
-        // Initialize credentials and service object.
         credential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+
         initGmailService();
 
         textView = (TextView) findViewById(R.id.textView);
 
-        apiButton = findViewById(R.id.apiButton);
-        apiButton.setOnClickListener(event -> getResultsFromApi());
-
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage(getString(R.string.calling_api));
+        mProgress.setMessage(getString(R.string.progress_dialog_message));
+
+        getResultsFromApi();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -142,21 +134,30 @@ public class MainActivity extends AppCompatActivity
         transaction = getSupportFragmentManager().beginTransaction();
         switch (item.getItemId()) {
             case R.id.inbox_messages:
-                    transaction.add(R.id.fragmentLayout, new InboxFragment(), INBOX_FRAGMENT_TAG);
+                    transaction.replace(R.id.fragmentLayout, new InboxFragment(), INBOX_FRAGMENT_TAG);
                 break;
             case R.id.outbox_messages:
-                    transaction.add(R.id.fragmentLayout, new OutboxFragment(), OUTBOX_FRAGMENT_TAG);
+                    transaction.replace(R.id.fragmentLayout, new OutboxFragment(), OUTBOX_FRAGMENT_TAG);
                 break;
             case R.id.drafts:
-                    transaction.add(R.id.fragmentLayout, new DraftsFragment(), DRAFTS_FRAGMENT_TAG);
+                    transaction.replace(R.id.fragmentLayout, new DraftsFragment(), DRAFTS_FRAGMENT_TAG);
+
                 break;
             case R.id.recycle:
-                    transaction.add(R.id.fragmentLayout, new RecycleFragment(), RECYCLE_FRAGMENT_TAG);
+                    transaction.replace(R.id.fragmentLayout, new RecycleFragment(), RECYCLE_FRAGMENT_TAG);
                 break;
         }
-        transaction.commit();
         drawerLayout.closeDrawer(Gravity.START);
+        transaction.commit();
         return true;
+    }
+
+    private void checkDrawer() {
+        if (!drawerLayout.isDrawerOpen(Gravity.START)) {
+            transaction.commit();
+        } else {
+            checkDrawer();
+        }
     }
 
     private boolean findAndReplaceFragment(String tag) {
@@ -189,11 +190,19 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.move_back:
                 getSupportFragmentManager().beginTransaction()
-                        .remove(getSupportFragmentManager().findFragmentByTag(NEW_EMAIL_TAG))
+                        .detach(getSupportFragmentManager().findFragmentByTag(NEW_EMAIL_TAG))
                         .commit();
                 break;
         }
         return true;
+    }
+
+    public static Gmail getGmailService() {
+        return gmailService;
+    }
+
+    public static void setGmailService(Gmail gmailService) {
+        MainActivity.gmailService = gmailService;
     }
 
     private void getResultsFromApi() {
@@ -204,14 +213,18 @@ public class MainActivity extends AppCompatActivity
         } else if (!isDeviceOnline()) {
             textView.setText(R.string.no_connection);
         } else {
-            new MakeRequestTask(credential).execute();
+            //new MakeRequestTask().execute();
+
+                new RequestHandler(new GmailApiRequests(), null, mProgress, null, null, null)
+                        .execute(RequestType.GET_ALL_REFERENCES);
+
         }
     }
 
     private void initGmailService() {
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        mService = new Gmail.Builder(
+        gmailService = new Gmail.Builder(
                 transport, jsonFactory, credential)
                 .setApplicationName(getString(R.string.quickstart_api))
                 .build();
@@ -227,13 +240,11 @@ public class MainActivity extends AppCompatActivity
                 credential.setSelectedAccountName(accountName);
                 getResultsFromApi();
             } else {
-                // Start a dialog from which the user can choose an account
                 startActivityForResult(
                         credential.newChooseAccountIntent(),
                         REQUEST_ACCOUNT_PICKER);
             }
         } else {
-            // RequestType the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
                     "This app needs to access your Google account (via Contacts).",
@@ -336,35 +347,30 @@ public class MainActivity extends AppCompatActivity
 
 
     private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
-        private Exception mLastError = null;
-
-        MakeRequestTask(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new Gmail.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName(getString(R.string.quickstart_api))
-                    .build();
-            System.out.println(credential.getSelectedAccountName());
-        }
 
         @Override
         protected List<String> doInBackground(Void... params) {
             try {
                 return getDataFromApi();
             } catch (Exception e) {
-                mLastError = e;
                 cancel(true);
                 return null;
             }
         }
 
         private List<String> getDataFromApi() throws IOException {
-            // Get the labels in the user's account.
             String user = "me";
             List<String> labels = new ArrayList<>();
             ListLabelsResponse listResponse =
-                    mService.users().labels().list(user).execute();
+                    gmailService
+                            .users()
+                            .labels()
+                            .list(user)
+                            .execute();
+            ListMessagesResponse response = gmailService.users()
+                    .messages()
+                    .list(user)
+                    .execute();
             for (Label label : listResponse.getLabels()) {
                 labels.add(label.getName());
             }
@@ -386,27 +392,6 @@ public class MainActivity extends AppCompatActivity
             } else {
                 output.add(0, getString(R.string.retrieve_data));
                 textView.setText(TextUtils.join("\n", output));
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mProgress.hide();
-            if (mLastError != null) {
-                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) mLastError)
-                                    .getConnectionStatusCode());
-                } else if (mLastError instanceof UserRecoverableAuthIOException) {
-                    startActivityForResult(
-                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
-                            MainActivity.REQUEST_AUTHORIZATION);
-                } else {
-                    textView.setText(getString(R.string.error_occured)
-                            + mLastError.getMessage());
-                }
-            } else {
-                textView.setText(R.string.request_canceled);
             }
         }
     }

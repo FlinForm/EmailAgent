@@ -28,12 +28,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp" />
 
-            <Button
-                android:id="@+id/apiButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/api_button" />
-
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"

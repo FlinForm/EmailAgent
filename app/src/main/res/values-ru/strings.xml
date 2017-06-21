@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Email Клиент</string>
+    <string name="api_button">Вызвать gmail api</string>
+    <string name="test_button">Test button %s</string>
+    <string name="subject_text">Тема:</string>
+    <string name="receiver">Получатель:</string>
+    <string name="no_connection">Проверьте соединение с сетью.</string>
+    <string name="calling_api">Вызов Gmail API ...</string>
+    <string name="quickstart_api">Gmail API Android Quickstart</string>
+    <string name="retrieve_data">Информация полученная используя Gmail API:</string>
+    <string name="no_results">Нет резульлтатов.</string>
+    <string name="request_canceled">Запрос отменен.</string>
+    <string name="error_occured">Ошибка вызвана:</string>
+    <string name="back_arrow_name">переместиться назад</string>
+    <string name="navigation_toolbar_item">навигация</string>
+    <string name="inbox_messages">Входящие сообщения</string>
+    <string name="outbox_messages">Исходящие сообщения</string>
+    <string name="drafts">Черновики</string>
+    <string name="recycle">Корзина</string>
+    <string name="delete_item">УДАЛИТЬ</string>
+    <string name="progress_dialog_message">Получаем сообщения...</string>
+</resources>

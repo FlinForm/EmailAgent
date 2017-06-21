@@ -1,6 +1,7 @@
 package com.epam.androidlab.emailagent;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,7 +89,9 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
         return messages.size();
     }
 
-    public static class ItemViewHolder extends RecyclerView.ViewHolder {
+    public static class ItemViewHolder extends RecyclerView.ViewHolder
+    implements View.OnCreateContextMenuListener {
+        private final int MENU_ITEM_DELETE = 1;
         private final TextView mailerOrReceiver;
         private final TextView subject;
         private final TextView body;
@@ -101,6 +104,15 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
             subject = (TextView) itemView.findViewById(R.id.subject);
             body = (TextView) itemView.findViewById(R.id.body);
             newLetter = (TextView) itemView.findViewById(R.id.newLetter);
+
+            itemView.setOnCreateContextMenuListener(this);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu,
+                                        View v,
+                                        ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(0, MENU_ITEM_DELETE, 0, v.getResources().getString(R.string.delete_item));
         }
     }
 }

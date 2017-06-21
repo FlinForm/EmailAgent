@@ -1,5 +1,10 @@
 package com.epam.androidlab.emailagent.api;
 
+import com.epam.androidlab.emailagent.Mailbox;
+import com.google.api.client.googleapis.batch.BatchRequest;
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Draft;
@@ -9,19 +14,22 @@ import com.google.api.services.gmail.model.Message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 public class GmailApiRequests implements ApiRequests {
+    private final String INBOX_QUERY = "INBOX";
+    private final String OUTBOX_QUERY = "SENT";
+    private final String DRAFTS_QUERY = "DRAFT";
+    private final String TRASH_QUERY = "TRASH";
+
     //Finished
     @Override
-    public List<Message> getMessages(Gmail service, String userId, List<String> queries) throws IOException {
-        List<Message> messageReferences = new ArrayList<>();
-        List<Message> messages = new ArrayList<>();
-
+    public void getMessageReferences(Gmail service, String userId, List<String> queries)
+            throws IOException {
+        List<Message> messages = getListByQuery(queries.get(0));
         ListMessagesResponse response = service.users()
                 .messages()
                 .list(userId)
@@ -29,23 +37,52 @@ public class GmailApiRequests implements ApiRequests {
                 .execute();
 
         while (response.getMessages() != null) {
-            messageReferences.addAll(response.getMessages());
+            messages.addAll(response.getMessages());
             if (response.getNextPageToken() != null) {
                 String pageToken = response.getNextPageToken();
                 response = service.users()
                         .messages()
                         .list(userId)
-                        .setLabelIds(queries)
                         .setPageToken(pageToken)
                         .execute();
             } else {
+                System.out.println(messages.size());
                 break;
             }
         }
-        for (Message message : messageReferences) {
-            messages.add(getMessageById(service, userId, message));
+    }
+
+    @Override
+    public void batchRequest(Gmail service, String userId, List<Message> messages, String query)
+    throws IOException {
+        int startPosition = messages.size();
+        int endPosition = startPosition + 10;
+        List<Message> messagesLinks = getListByQuery(query);
+        BatchRequest batchRequest = service.batch();
+        JsonBatchCallback<Message> callback = new JsonBatchCallback<Message>() {
+            @Override
+            public void onFailure(GoogleJsonError e, HttpHeaders responseHeaders) throws IOException {
+
+            }
+
+            @Override
+            public void onSuccess(Message message, HttpHeaders responseHeaders) throws IOException {
+                messages.add(message);
+            }
+        };
+        for (int i = startPosition; i < endPosition; i++) {
+            if (i > messagesLinks.size() - 1) {
+                break;
+            }
+            System.out.println(i);
+            Message message = messagesLinks.get(i);
+            service.users().messages().get(userId, message.getId()).queue(batchRequest, callback);
         }
-        return messages;
+
+        /*for (Message message : messagesLinks) {
+            service.users().messages().get(userId, message.getId()).queue(batchRequest, callback);
+        }*/
+        batchRequest.execute();
     }
 
     //Finished
@@ -111,5 +148,19 @@ public class GmailApiRequests implements ApiRequests {
         draft.setMessage(message);
         service.users().drafts().send(userId, draft).execute();
         return draft;
+    }
+
+    private List<Message> getListByQuery(String query) {
+        switch (query) {
+            case INBOX_QUERY:
+                return Mailbox.getInboxMessages();
+            case OUTBOX_QUERY:
+                return Mailbox.getOutboxMessages();
+            case DRAFTS_QUERY:
+                return Mailbox.getDrafts();
+            case TRASH_QUERY:
+                return Mailbox.getTrash();
+        }
+        return null;
     }
 }
