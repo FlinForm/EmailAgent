@@ -10,7 +10,7 @@ public class Mailbox {
     private static List<Message> outboxMessages = new ArrayList<>();
     private static List<Message> drafts = new ArrayList<>();
     private static List<Message> trash = new ArrayList<>();
-    private static List<Message> notRead = new ArrayList<>();
+    private static List<Message> unRead = new ArrayList<>();
 
     private Mailbox() {
     }
@@ -31,8 +31,8 @@ public class Mailbox {
         return trash;
     }
 
-    public static List<Message> getNotRead() {
-        return notRead;
+    public static List<Message> getUnRead() {
+        return unRead;
     }
 
     public static void setInboxMessages(List<Message> inboxMessages) {
@@ -51,7 +51,7 @@ public class Mailbox {
         Mailbox.trash = trash;
     }
 
-    public static void setNotRead(List<Message> notRead) {
-        Mailbox.notRead = notRead;
+    public static void setUnRead(List<Message> unRead) {
+        Mailbox.unRead = unRead;
     }
 }

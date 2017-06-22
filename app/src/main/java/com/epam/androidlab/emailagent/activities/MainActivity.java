@@ -4,11 +4,8 @@ import com.epam.androidlab.emailagent.R;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
 import com.epam.androidlab.emailagent.api.RequestType;
-import com.epam.androidlab.emailagent.fragments.DraftsFragment;
-import com.epam.androidlab.emailagent.fragments.InboxFragment;
+import com.epam.androidlab.emailagent.fragments.MailboxFragment;
 import com.epam.androidlab.emailagent.fragments.NewEmailFragment;
-import com.epam.androidlab.emailagent.fragments.OutboxFragment;
-import com.epam.androidlab.emailagent.fragments.RecycleFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -36,6 +33,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +53,7 @@ public class MainActivity extends AppCompatActivity
         implements EasyPermissions.PermissionCallbacks,
         NavigationView.OnNavigationItemSelectedListener {
 
+    private final String MAILBOX_IDENTIFIER_TAG = "identifier";
     private final String INBOX_FRAGMENT_TAG = "InboxFragment";
     private final String OUTBOX_FRAGMENT_TAG = "OutboxFragment";
     private final String DRAFTS_FRAGMENT_TAG = "DraftsFragment";
@@ -120,18 +119,31 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         transaction = getSupportFragmentManager().beginTransaction();
+        Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case R.id.inbox_messages:
-                    transaction.replace(R.id.fragmentLayout, new InboxFragment(), INBOX_FRAGMENT_TAG);
+                Fragment inboxFragment = new MailboxFragment();
+                bundle.putString(MAILBOX_IDENTIFIER_TAG, RequestType.INBOX.toString());
+                inboxFragment.setArguments(bundle);
+                transaction.replace(R.id.fragmentLayout, inboxFragment, INBOX_FRAGMENT_TAG);
                 break;
             case R.id.outbox_messages:
-                    transaction.replace(R.id.fragmentLayout, new OutboxFragment(), OUTBOX_FRAGMENT_TAG);
+                Fragment outboxFragment = new MailboxFragment();
+                bundle.putString(MAILBOX_IDENTIFIER_TAG, RequestType.SENT.toString());
+                outboxFragment.setArguments(bundle);
+                transaction.replace(R.id.fragmentLayout, outboxFragment, OUTBOX_FRAGMENT_TAG);
                 break;
             case R.id.drafts:
-                    transaction.replace(R.id.fragmentLayout, new DraftsFragment(), DRAFTS_FRAGMENT_TAG);
+                Fragment draftsFragment = new MailboxFragment();
+                bundle.putString(MAILBOX_IDENTIFIER_TAG, RequestType.DRAFT.toString());
+                draftsFragment.setArguments(bundle);
+                transaction.replace(R.id.fragmentLayout, draftsFragment, DRAFTS_FRAGMENT_TAG);
                 break;
             case R.id.recycle:
-                    transaction.replace(R.id.fragmentLayout, new RecycleFragment(), RECYCLE_FRAGMENT_TAG);
+                Fragment recycleFragment = new MailboxFragment();
+                bundle.putString(MAILBOX_IDENTIFIER_TAG, RequestType.TRASH.toString());
+                recycleFragment.setArguments(bundle);
+                transaction.replace(R.id.fragmentLayout, recycleFragment, RECYCLE_FRAGMENT_TAG);
                 break;
         }
         drawerLayout.closeDrawer(Gravity.START);

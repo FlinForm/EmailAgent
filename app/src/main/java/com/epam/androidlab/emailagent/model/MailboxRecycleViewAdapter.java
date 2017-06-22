@@ -13,7 +13,7 @@ import com.google.api.services.gmail.model.MessagePartHeader;
 
 import java.util.List;
 
-public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.ItemViewHolder> {
+public class MailboxRecycleViewAdapter extends RecyclerView.Adapter<MailboxRecycleViewAdapter.ItemViewHolder> {
     private final List<Message> messages;
     private final String SUBJECT_TAG = "Subject";
     private final String INBOX_TAG = "INBOX";
@@ -21,7 +21,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
     private final String MAILER = "From";
     private static View view;
 
-    public RecycleViewAdapter(List<Message> messages) {
+    public MailboxRecycleViewAdapter(List<Message> messages) {
         this.messages = messages;
     }
 
