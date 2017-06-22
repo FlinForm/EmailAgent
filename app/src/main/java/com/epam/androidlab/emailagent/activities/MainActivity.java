@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.move_back:
                 getSupportFragmentManager().beginTransaction()
-                        .detach(getSupportFragmentManager().findFragmentByTag(NEW_EMAIL_TAG))
+                        .remove(getSupportFragmentManager().findFragmentByTag(NEW_EMAIL_TAG))
                         .commit();
                 break;
         }

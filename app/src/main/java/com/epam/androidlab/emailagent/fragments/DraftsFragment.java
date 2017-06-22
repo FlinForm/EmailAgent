@@ -11,9 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.epam.androidlab.emailagent.Mailbox;
+import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.R;
-import com.epam.androidlab.emailagent.RecycleViewAdapter;
+import com.epam.androidlab.emailagent.model.RecycleViewAdapter;
 import com.epam.androidlab.emailagent.activities.MainActivity;
 import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
@@ -65,13 +65,11 @@ public class DraftsFragment extends Fragment implements View.OnScrollChangeListe
         }
 
         View fab = view.findViewById(R.id.recycleFab);
-        fab.setOnClickListener(event -> {
-            getActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.NEW_EMAIL_TAG)
-                    .commit();
-            });
+        fab.setOnClickListener(event -> getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.NEW_EMAIL_TAG)
+                .commit());
     }
 
     @Override

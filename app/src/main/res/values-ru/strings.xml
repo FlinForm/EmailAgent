@@ -20,4 +20,6 @@
     <string name="delete_item">УДАЛИТЬ</string>
     <string name="progress_dialog_message">Получаем сообщения...</string>
     <string name="no_services_found">Не найдены сервисы Google!</string>
+    <string name="no_content"><![CDATA[<Нет содержимого>]]></string>
+    <string name="email_address_warning">Введите адрес электронной почты!</string>
 </resources>

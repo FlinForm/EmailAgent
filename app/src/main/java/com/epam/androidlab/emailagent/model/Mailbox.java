@@ -1,10 +1,9 @@
-package com.epam.androidlab.emailagent;
+package com.epam.androidlab.emailagent.model;
 
 import com.google.api.services.gmail.model.Message;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Mailbox {
     private static List<Message> inboxMessages = new ArrayList<>();

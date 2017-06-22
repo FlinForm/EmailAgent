@@ -11,9 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.epam.androidlab.emailagent.Mailbox;
+import com.epam.androidlab.emailagent.activities.MainActivity;
+import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.R;
-import com.epam.androidlab.emailagent.RecycleViewAdapter;
+import com.epam.androidlab.emailagent.model.RecycleViewAdapter;
 import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
@@ -67,7 +68,7 @@ public class InboxFragment extends Fragment  implements View.OnScrollChangeListe
         fab.setOnClickListener(event -> getActivity()
                 .getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragmentLayout, new NewEmailFragment())
+                .replace(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.NEW_EMAIL_TAG)
                 .commit());
     }
 

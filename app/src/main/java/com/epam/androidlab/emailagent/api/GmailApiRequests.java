@@ -1,6 +1,6 @@
 package com.epam.androidlab.emailagent.api;
 
-import com.epam.androidlab.emailagent.Mailbox;
+import com.epam.androidlab.emailagent.model.Mailbox;
 import com.google.api.client.googleapis.batch.BatchRequest;
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
 import com.google.api.client.googleapis.json.GoogleJsonError;

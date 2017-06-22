@@ -66,33 +66,9 @@ public class NewEmailFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        /*if (!isEmailSent) {
-            MimeMessage mimeMessage = GmailApiHelper
-                    .createNewEmailMessage(credential.getSelectedAccountName(),
-                            receiver.getText().toString(),
-                            subject.getText().toString(),
-                            emailBody.getText().toString());
-            new RequestHandler(new GmailApiRequests(), credential, mimeMessage, null)
-                    .execute(RequestType.MAKE_DRAFT);
-        }*/
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     private void sendNewEmail(View view) {
         if ("".equals(receiver.getText().toString())) {
-            Snackbar.make(view, "Enter email address!", BaseTransientBottomBar.LENGTH_LONG).show();
+            Snackbar.make(view, R.string.email_address_warning, BaseTransientBottomBar.LENGTH_LONG).show();
             return;
         }
         if (GmailApiHelper.isDeviceOnline(getContext())) {
@@ -101,9 +77,15 @@ public class NewEmailFragment extends Fragment {
                             receiver.getText().toString(),
                             subject.getText().toString(),
                             emailBody.getText().toString());
-            new RequestHandler(new GmailApiRequests(), null, null, null, mimeMessage, null)
+            new RequestHandler(new GmailApiRequests(),
+                    null,
+                    null,
+                    null,
+                    mimeMessage,
+                    null)
                     .execute(RequestType.SEND_EMAIL);
         }
         isEmailSent = true;
+        getFragmentManager().beginTransaction().remove(this).commit();
     }
 }
