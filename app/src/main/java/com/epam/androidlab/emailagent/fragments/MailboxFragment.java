@@ -1,6 +1,7 @@
 package com.epam.androidlab.emailagent.fragments;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -32,6 +33,11 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
     private LinearLayoutManager linearLayoutManager;
     private ProgressDialog progressDialog;
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -55,7 +61,7 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
         messages = new ArrayList<>();
         linearLayoutManager = new LinearLayoutManager(getContext());
 
-        MailboxRecycleViewAdapter adapter = new MailboxRecycleViewAdapter(messages);
+        MailboxRecycleViewAdapter adapter = new MailboxRecycleViewAdapter(getActivity(), messages);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recycleView);
         recyclerView.setLayoutManager(linearLayoutManager);

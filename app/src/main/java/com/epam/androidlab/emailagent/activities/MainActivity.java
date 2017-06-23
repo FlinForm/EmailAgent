@@ -4,8 +4,10 @@ import com.epam.androidlab.emailagent.R;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
 import com.epam.androidlab.emailagent.api.RequestType;
+import com.epam.androidlab.emailagent.fragments.EmailLetterFragment;
 import com.epam.androidlab.emailagent.fragments.MailboxFragment;
 import com.epam.androidlab.emailagent.fragments.NewEmailFragment;
+import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
@@ -51,7 +53,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity extends AppCompatActivity
         implements EasyPermissions.PermissionCallbacks,
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener,
+        MailboxRecycleViewAdapter.OnMailSelectedListener {
 
     private final String MAILBOX_IDENTIFIER_TAG = "identifier";
     private final String INBOX_FRAGMENT_TAG = "InboxFragment";
@@ -322,5 +325,13 @@ public class MainActivity extends AppCompatActivity
 
     public static GoogleAccountCredential getCredential() {
         return credential;
+    }
+
+    @Override
+    public void onMailSelected() {
+        System.out.println(1);
+        /*transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentLayout, new EmailLetterFragment(), DRAFTS_FRAGMENT_TAG);
+        transaction.commit();*/
     }
 }
