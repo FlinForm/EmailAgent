@@ -1,6 +1,7 @@
 package com.epam.androidlab.emailagent.api;
 
 import com.epam.androidlab.emailagent.model.Mailbox;
+import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.google.api.client.googleapis.batch.BatchRequest;
 import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
 import com.google.api.client.googleapis.json.GoogleJsonError;
@@ -42,7 +43,6 @@ public class GmailApiRequests implements ApiRequests {
                         .setPageToken(pageToken)
                         .execute();
             } else {
-                System.out.println(messages.size());
                 break;
             }
         }
@@ -97,8 +97,14 @@ public class GmailApiRequests implements ApiRequests {
 
     //Finished
     @Override
-    public void deleteMessage(Gmail service, String userId, Message message) throws IOException {
-        service.users().threads().delete(userId, message.getId()).execute();
+    public void deleteMessage(Gmail service, String userId, String messageId) throws IOException {
+        service.users().threads().delete(userId, messageId).execute();
+    }
+
+    //Finished
+    @Override
+    public void trashMessage(Gmail service, String userId, String messageId) throws IOException {
+        service.users().messages().trash(userId, messageId).execute();
     }
 
     //Finished
@@ -149,7 +155,7 @@ public class GmailApiRequests implements ApiRequests {
     }
 
     private List<Message> getListByQuery(String query) {
-        switch (RequestType.valueOf(query)) {
+        switch (MailboxIdentifiers.valueOf(query)) {
             case INBOX:
                 return Mailbox.getInboxMessages();
             case SENT:

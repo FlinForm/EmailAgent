@@ -11,6 +11,7 @@ public class Mailbox {
     private static List<Message> drafts = new ArrayList<>();
     private static List<Message> trash = new ArrayList<>();
     private static List<Message> unRead = new ArrayList<>();
+    private static Message message;
 
     private Mailbox() {
     }
@@ -35,23 +36,11 @@ public class Mailbox {
         return unRead;
     }
 
-    public static void setInboxMessages(List<Message> inboxMessages) {
-        Mailbox.inboxMessages = inboxMessages;
+    public static Message getMessage() {
+        return message;
     }
 
-    public static void setOutboxMessages(List<Message> outboxMessages) {
-        Mailbox.outboxMessages = outboxMessages;
-    }
-
-    public static void setDrafts(List<Message> drafts) {
-        Mailbox.drafts = drafts;
-    }
-
-    public static void setTrash(List<Message> trash) {
-        Mailbox.trash = trash;
-    }
-
-    public static void setUnRead(List<Message> unRead) {
-        Mailbox.unRead = unRead;
+    public static void setMessage(Message message) {
+        Mailbox.message = message;
     }
 }

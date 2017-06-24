@@ -9,31 +9,30 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
-import com.epam.androidlab.emailagent.activities.MainActivity;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePartHeader;
 
 import java.util.List;
 
-public class MailboxRecycleViewAdapter extends RecyclerView.Adapter<MailboxRecycleViewAdapter.ItemViewHolder> {
-    private FragmentActivity activity;
+public class MailboxRecycleViewAdapter
+        extends RecyclerView.Adapter<MailboxRecycleViewAdapter.ItemViewHolder> {
     private final List<Message> messages;
+    private final String EXCEPTION_TEXT = " must implement OnMailSelectedListener";
     private final String SUBJECT_TAG = "Subject";
     private final String INBOX_TAG = "INBOX";
     private final String RECEIVER = "To";
     private final String MAILER = "From";
+
     private View view;
     public static OnMailSelectedListener listener;
 
     public MailboxRecycleViewAdapter(FragmentActivity activity, List<Message> messages) {
-        this.activity = activity;
         this.messages = messages;
 
         try {
             listener = (OnMailSelectedListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity + toString() +
-                    " must implement OnMailSelectedListener");
+            throw new ClassCastException(activity + toString() + EXCEPTION_TEXT);
         }
     }
 
@@ -47,8 +46,10 @@ public class MailboxRecycleViewAdapter extends RecyclerView.Adapter<MailboxRecyc
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
+        holder.MENU_ITEM_ID = position;
         holder.mailerOrReceiver.setText(getMailerOrReceiver(messages.get(position)));
         holder.subject.setText(getMessageSubject(messages.get(position)));
+        holder.message = messages.get(position);
         if ("".equals(messages.get(position).getSnippet())) {
             holder.body.setText(R.string.no_content);
         } else {
@@ -106,11 +107,10 @@ public class MailboxRecycleViewAdapter extends RecyclerView.Adapter<MailboxRecyc
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder
     implements View.OnCreateContextMenuListener, View.OnClickListener {
-        private final int MENU_ITEM_DELETE = 1;
         private final TextView mailerOrReceiver;
         private final TextView subject;
         private final TextView body;
-        private final TextView newLetter;
+        private int MENU_ITEM_ID;
         private Message message;
 
         public ItemViewHolder(View itemView) {
@@ -118,7 +118,6 @@ public class MailboxRecycleViewAdapter extends RecyclerView.Adapter<MailboxRecyc
             mailerOrReceiver = (TextView) itemView.findViewById(R.id.mailer);
             subject = (TextView) itemView.findViewById(R.id.subject);
             body = (TextView) itemView.findViewById(R.id.body);
-            newLetter = (TextView) itemView.findViewById(R.id.newLetter);
 
             itemView.setOnCreateContextMenuListener(this);
             itemView.setOnClickListener(this);
@@ -128,15 +127,17 @@ public class MailboxRecycleViewAdapter extends RecyclerView.Adapter<MailboxRecyc
         public void onCreateContextMenu(ContextMenu menu,
                                         View v,
                                         ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(0, MENU_ITEM_DELETE, 0, v.getResources().getString(R.string.delete_item));
+            menu.add(0, MENU_ITEM_ID, 0, v.getResources().getString(R.string.delete_item));
         }
 
         @Override
         public void onClick(View v) {
-            listener.onMailSelected();
+            Mailbox.setMessage(message);
+            listener.onLetterSelected();
         }
     }
+
     public interface OnMailSelectedListener {
-        void onMailSelected();
+        void onLetterSelected();
     }
 }

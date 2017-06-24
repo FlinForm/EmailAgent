@@ -15,13 +15,15 @@ public interface ApiRequests {
 
     void batchRequest(Gmail service, String userId, List<Message> messages, String query) throws IOException;
 
+    void trashMessage(Gmail service, String userId, String messageId) throws IOException;
+
     List<Draft> getDrafts(Gmail service, String userId) throws IOException;
 
     Message getMessageById(Gmail service, String userId, Message message) throws IOException;
 
     Message getDraftById(Gmail service, String userId, Draft draft) throws IOException;
 
-    void deleteMessage(Gmail service, String userId, Message message) throws IOException;
+    void deleteMessage(Gmail service, String userId, String messageId) throws IOException;
 
     Draft makeAndSendDraft(Gmail service, String userId, MimeMessage email)
             throws IOException, MessagingException;

@@ -1,7 +1,6 @@
 package com.epam.androidlab.emailagent.fragments;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,6 +18,7 @@ import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
 import com.epam.androidlab.emailagent.api.RequestType;
 import com.epam.androidlab.emailagent.model.Mailbox;
+import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
 import com.google.api.services.gmail.model.Message;
 
@@ -26,17 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MailboxFragment extends Fragment implements View.OnScrollChangeListener {
-    private final String MAILBOX_IDENTIFIER_TAG = "identifier";
-    private RequestType mailboxIdentifier;
+    private String MAILBOX_IDENTIFIER_TAG = "identifier";
+    private MailboxIdentifiers mailboxIdentifier;
     private List<Message> messages;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private ProgressDialog progressDialog;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
 
     @Nullable
     @Override
@@ -52,7 +47,7 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
 
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            mailboxIdentifier = RequestType.valueOf(bundle.getString(MAILBOX_IDENTIFIER_TAG));
+            mailboxIdentifier = MailboxIdentifiers.valueOf(bundle.getString(MAILBOX_IDENTIFIER_TAG));
         }
 
         progressDialog = new ProgressDialog(getContext());
@@ -74,7 +69,7 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
                     progressDialog,
                     recyclerView,
                     null,
-                    null).execute(RequestType.MAKE_BATCH_REQUEST, mailboxIdentifier);
+                    null).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
         }
 
         View fab = view.findViewById(R.id.recycleFab);
@@ -88,7 +83,28 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        return super.onContextItemSelected(item);
+        String messageId = messages.get(item.getItemId()).getId();
+        if (GmailApiHelper.isDeviceOnline(getContext())) {
+            if (mailboxIdentifier.equals(MailboxIdentifiers.TRASH)) {
+                new RequestHandler(new GmailApiRequests(),
+                        messages,
+                        progressDialog,
+                        recyclerView,
+                        null,
+                        messageId).execute(RequestType.DELETE_MESSAGE, null);
+            } else {
+                new RequestHandler(new GmailApiRequests(),
+                        messages,
+                        progressDialog,
+                        recyclerView,
+                        null,
+                        messageId).execute(RequestType.DELETE_MESSAGE, MailboxIdentifiers.TRASH);
+            }
+        }
+        messages.remove(item.getItemId());
+        recyclerView.getAdapter().notifyDataSetChanged();
+        getMailboxByIdentifier().remove(item.getItemId());
+        return true;
     }
 
     // !!!!!! FIX SCREEN ROTATION BUG !!!!!!!!!
@@ -104,7 +120,7 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
                             progressDialog,
                             recyclerView,
                             null,
-                            null).execute(RequestType.MAKE_BATCH_REQUEST, mailboxIdentifier);
+                            null).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
                 }
             }
         }
