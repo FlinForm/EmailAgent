@@ -22,4 +22,7 @@
     <string name="no_services_found">No Google Services found!</string>
     <string name="no_content"><![CDATA[<No content>]]></string>
     <string name="email_address_warning">Enter email address!</string>
+    <string name="subject">subject:</string>
+    <string name="mailer">mailer:</string>
+    <string name="problems_with_content">There are some problems with loading message content.</string>
 </resources>

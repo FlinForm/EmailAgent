@@ -1,6 +1,7 @@
 package com.epam.androidlab.emailagent.activities;
 
 import com.epam.androidlab.emailagent.R;
+import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
 import com.epam.androidlab.emailagent.api.RequestType;
@@ -9,7 +10,7 @@ import com.epam.androidlab.emailagent.fragments.MailboxFragment;
 import com.epam.androidlab.emailagent.fragments.NewEmailFragment;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
-import com.google.android.gms.common.ConnectionResult;
+import com.epam.androidlab.emailagent.provider.MailboxContentProvider;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -29,8 +30,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
@@ -74,10 +73,11 @@ public class MainActivity extends AppCompatActivity
             GmailScopes.GMAIL_READONLY,
             GmailScopes.MAIL_GOOGLE_COM};
 
-    private FragmentTransaction transaction;
-    private DrawerLayout drawerLayout;
     private static com.google.api.services.gmail.Gmail gmailService = null;
     private static GoogleAccountCredential credential;
+
+    private FragmentTransaction transaction;
+    private DrawerLayout drawerLayout;
     private ProgressDialog mProgress;
     public Toolbar toolBar;
 
@@ -115,6 +115,31 @@ public class MainActivity extends AppCompatActivity
                 .add(R.id.fragmentLayout, new NewEmailFragment(), NEW_EMAIL_TAG)
                 .commit());
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    /*private void init() {
+        // Your Google Cloud Platform project ID
+        String projectId = ServiceOptions.getDefaultProjectId();
+
+        // Your topic ID
+        String topicId = "my-new-topic";
+
+        // Create a new topic
+        TopicName topic = TopicName.create(projectId, topicId);
+        try (TopicAdminClient topicAdminClient = TopicAdminClient.create()) {
+            topicAdminClient.createTopic(topic);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.printf("Topic %s:%s created.\n", topic.getProject(), topic.getTopic());
+    }*/
 
     // Sometimes replacing fragments don't work.
     @Override
@@ -199,18 +224,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getResultsFromApi() {
-        if (!isGooglePlayServicesAvailable()) {
+        if (!GmailApiHelper.isGooglePlayServicesAvailable(this)) {
             acquireGooglePlayServices();
         } else if (credential.getSelectedAccountName() == null) {
             chooseAccount();
-        } else if (!isDeviceOnline()) {
+        } else if (!GmailApiHelper.isDeviceOnline(this)) {
             Snackbar.make(getCurrentFocus(),
                     getString(R.string.no_connection),
                     BaseTransientBottomBar.LENGTH_LONG).show();
         } else {
             new RequestHandler(new GmailApiRequests(), null, mProgress, null, null, null)
                     .execute(RequestType.GET_ALL_REFERENCES);
-
         }
     }
 
@@ -301,21 +325,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onPermissionsDenied(int requestCode, List<String> list) {
         // Do nothing.
-    }
-
-    private boolean isDeviceOnline() {
-        ConnectivityManager connMgr =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnected());
-    }
-
-    private boolean isGooglePlayServicesAvailable() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(this);
-        return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
     private void acquireGooglePlayServices() {

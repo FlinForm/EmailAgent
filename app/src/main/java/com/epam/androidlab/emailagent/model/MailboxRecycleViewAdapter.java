@@ -134,6 +134,7 @@ public class MailboxRecycleViewAdapter
         public void onClick(View v) {
             Mailbox.setMessage(message);
             listener.onLetterSelected();
+            System.out.println(message.getPayload().getHeaders());
         }
     }
 

@@ -77,22 +77,13 @@ public class GmailApiRequests implements ApiRequests {
                 break;
             }
             Message message = messagesLinks.get(i);
-            service.users().messages().get(userId, message.getId()).queue(batchRequest, callback);
+            service.users()
+                    .messages()
+                    .get(userId, message.getId())
+                    .setFormat("full")
+                    .queue(batchRequest, callback);
         }
-
         batchRequest.execute();
-    }
-
-    //Finished
-    @Override
-    public Message getMessageById(Gmail service, String userId, Message message) throws IOException {
-        return service.users().messages().get(userId, message.getId()).execute();
-    }
-
-    //Finished
-    @Override
-    public Message getDraftById(Gmail service, String userId, Draft draft) throws IOException {
-        return service.users().drafts().get(userId, draft.getId()).execute().getMessage();
     }
 
     //Finished
@@ -107,16 +98,6 @@ public class GmailApiRequests implements ApiRequests {
         service.users().messages().trash(userId, messageId).execute();
     }
 
-    //Finished
-    @Override
-    public List<Draft> getDrafts(Gmail service, String userId) throws IOException {
-        ListDraftsResponse response = service.users().drafts().list(userId).execute();
-        List<Draft> drafts = response.getDrafts();
-        for (Draft draft : drafts) {
-            System.out.println(getDraftById(service, userId, draft).getLabelIds());
-        }
-        return drafts;
-    }
 
     //Finished
     @Override
@@ -136,22 +117,6 @@ public class GmailApiRequests implements ApiRequests {
         Message message = new Message();
         message.setRaw(encodedEmail);
         return message;
-    }
-
-    //Finished
-    @Override
-    public Draft makeAndSendDraft(Gmail service, String userId, MimeMessage email)
-            throws IOException, MessagingException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        email.writeTo(buffer);
-        byte[] bytes = buffer.toByteArray();
-        String encodedEmail = Base64.encodeBase64URLSafeString(bytes);
-        Message message = new Message();
-        message.setRaw(encodedEmail);
-        Draft draft = new Draft();
-        draft.setMessage(message);
-        service.users().drafts().send(userId, draft).execute();
-        return draft;
     }
 
     private List<Message> getListByQuery(String query) {

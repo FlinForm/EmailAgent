@@ -4,6 +4,20 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.epam.androidlab.emailagent.R;
+import com.epam.androidlab.emailagent.model.Mailbox;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePartHeader;
+
 import java.util.Properties;
 
 import javax.mail.MessagingException;
@@ -18,6 +32,14 @@ public class GmailApiHelper {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
+    }
+
+    public static boolean isGooglePlayServicesAvailable(Context context) {
+        GoogleApiAvailability apiAvailability =
+                GoogleApiAvailability.getInstance();
+        final int connectionStatusCode =
+                apiAvailability.isGooglePlayServicesAvailable(context);
+        return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
     //Finished
@@ -37,6 +59,18 @@ public class GmailApiHelper {
                 return email;
             } catch (MessagingException e) {
                 e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static String getMessagePart(String part, Message message) {
+        if (message == null) {
+            message = Mailbox.getMessage();
+        }
+        for (MessagePartHeader partHeader : message.getPayload().getHeaders()) {
+            if (part.equals(partHeader.getName())) {
+                return partHeader.getValue();
             }
         }
         return null;

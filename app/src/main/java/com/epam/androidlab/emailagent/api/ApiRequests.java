@@ -17,16 +17,8 @@ public interface ApiRequests {
 
     void trashMessage(Gmail service, String userId, String messageId) throws IOException;
 
-    List<Draft> getDrafts(Gmail service, String userId) throws IOException;
-
-    Message getMessageById(Gmail service, String userId, Message message) throws IOException;
-
-    Message getDraftById(Gmail service, String userId, Draft draft) throws IOException;
 
     void deleteMessage(Gmail service, String userId, String messageId) throws IOException;
-
-    Draft makeAndSendDraft(Gmail service, String userId, MimeMessage email)
-            throws IOException, MessagingException;
 
     Message sendEmail(Gmail service, String userId, MimeMessage email)
             throws MessagingException, IOException;

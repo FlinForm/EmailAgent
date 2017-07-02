@@ -22,4 +22,7 @@
     <string name="no_services_found">Не найдены сервисы Google!</string>
     <string name="no_content"><![CDATA[<Нет содержимого>]]></string>
     <string name="email_address_warning">Введите адрес электронной почты!</string>
+    <string name="subject">тема:</string>
+    <string name="mailer">отправитель:</string>
+    <string name="problems_with_content">Возникли проблемы с загрузкой контента.</string>
 </resources>

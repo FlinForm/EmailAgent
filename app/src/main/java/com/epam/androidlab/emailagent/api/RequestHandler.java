@@ -1,7 +1,9 @@
 package com.epam.androidlab.emailagent.api;
 
 import android.app.ProgressDialog;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 
 import com.epam.androidlab.emailagent.activities.MainActivity;
@@ -13,7 +15,6 @@ import com.google.api.services.gmail.model.Message;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -123,6 +124,7 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     private void getAllReferences() throws IOException {
         queries.add(MailboxIdentifiers.INBOX.toString());
         apiRequests.getMessageReferences(service, myId, queries);
+        System.out.println(Mailbox.getInboxMessages().get(0).getSnippet());
         queries.clear();
         queries.add(MailboxIdentifiers.DRAFT.toString());
         apiRequests.getMessageReferences(service, myId, queries);
