@@ -7,10 +7,9 @@ import com.epam.androidlab.emailagent.api.RequestHandler;
 import com.epam.androidlab.emailagent.api.RequestType;
 import com.epam.androidlab.emailagent.fragments.EmailLetterFragment;
 import com.epam.androidlab.emailagent.fragments.MailboxFragment;
-import com.epam.androidlab.emailagent.fragments.NewEmailFragment;
+import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
-import com.epam.androidlab.emailagent.provider.MailboxContentProvider;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -43,13 +42,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import java.util.Arrays;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity
         implements EasyPermissions.PermissionCallbacks,
@@ -57,8 +57,7 @@ public class MainActivity extends AppCompatActivity
         MailboxRecycleViewAdapter.OnMailSelectedListener {
 
     private final String MAILBOX_IDENTIFIER_TAG = "identifier";
-    private static final String EMAIL_LETTER_FRAGMENT_TAG = "LetterFragment";
-    public static final String NEW_EMAIL_TAG = "NewEmailFragment";
+    public static final String EMAIL_FRAGMENT_TAG = "NewEmailFragment";
 
     private static final int REQUEST_ACCOUNT_PICKER = 1000;
     private static final int REQUEST_AUTHORIZATION = 1001;
@@ -76,44 +75,56 @@ public class MainActivity extends AppCompatActivity
     private static com.google.api.services.gmail.Gmail gmailService = null;
     private static GoogleAccountCredential credential;
 
+    private Fragment activeFragment;
     private FragmentTransaction transaction;
     private DrawerLayout drawerLayout;
     private ProgressDialog mProgress;
-    public Toolbar toolBar;
+    private Toolbar toolBar;
+    private boolean authCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        transaction  = getSupportFragmentManager().beginTransaction();
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build()
+        );
 
         toolBar = (Toolbar) findViewById(R.id.toolbar);
         toolBar.setTitle("");
         toolBar.inflateMenu(R.menu.new_email_tmenu);
         setSupportActionBar(toolBar);
 
-        credential = GoogleAccountCredential.usingOAuth2(
-                getApplicationContext(), Arrays.asList(SCOPES))
-                .setBackOff(new ExponentialBackOff());
-
-        initGmailService();
-
         mProgress = new ProgressDialog(this);
         mProgress.setMessage(getString(R.string.progress_dialog_message));
 
-        getResultsFromApi();
+        if (!Mailbox.isLinksReceived()) {
+            credential = GoogleAccountCredential.usingOAuth2(
+                    getApplicationContext(), Arrays.asList(SCOPES))
+                    .setBackOff(new ExponentialBackOff());
+            initGmailService();
+            getResultsFromApi();
+            Mailbox.setLinksReceived(true);
+        }
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+    }
 
-        View fab = findViewById(R.id.fab);
-        fab.setOnClickListener(event -> getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragmentLayout, new NewEmailFragment(), NEW_EMAIL_TAG)
-                .commit());
+    @Override
+    protected void onPause() {
+        mProgress.dismiss();
+        super.onPause();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     @Override
@@ -151,33 +162,37 @@ public class MainActivity extends AppCompatActivity
                 Fragment inboxFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.INBOX.toString());
                 inboxFragment.setArguments(bundle);
-                transaction.replace(R.id.fragmentLayout,
+                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
                         inboxFragment,
                         MailboxIdentifiers.INBOX.toString());
+                activeFragment = inboxFragment;
                 break;
             case R.id.outbox_messages:
                 Fragment outboxFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.SENT.toString());
                 outboxFragment.setArguments(bundle);
-                transaction.replace(R.id.fragmentLayout,
+                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
                         outboxFragment,
                         MailboxIdentifiers.SENT.toString());
+                activeFragment = outboxFragment;
                 break;
             case R.id.drafts:
                 Fragment draftsFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.DRAFT.toString());
                 draftsFragment.setArguments(bundle);
-                transaction.replace(R.id.fragmentLayout,
+                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
                         draftsFragment,
                         MailboxIdentifiers.DRAFT.toString());
+                activeFragment = draftsFragment;
                 break;
             case R.id.recycle:
                 Fragment recycleFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.TRASH.toString());
                 recycleFragment.setArguments(bundle);
-                transaction.replace(R.id.fragmentLayout,
+                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
                         recycleFragment,
                         MailboxIdentifiers.TRASH.toString());
+                activeFragment = recycleFragment;
                 break;
         }
         drawerLayout.closeDrawer(Gravity.START);
@@ -202,8 +217,13 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             case R.id.move_back:
+                if (activeFragment == null) {
+                    return false;
+                }
+
                 getSupportFragmentManager().beginTransaction()
-                        .remove(getSupportFragmentManager().findFragmentByTag(NEW_EMAIL_TAG))
+                        .replace(R.id.fragmentLayout,
+                                activeFragment)
                         .commit();
                 break;
         }
@@ -214,8 +234,7 @@ public class MainActivity extends AppCompatActivity
     public void onLetterSelected() {
         transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentLayout,
-                new EmailLetterFragment(),
-                MailboxIdentifiers.EMAIL_CONTENT.toString());
+                new EmailLetterFragment(), EMAIL_FRAGMENT_TAG);
         transaction.commit();
     }
 

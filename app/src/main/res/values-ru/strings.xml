@@ -25,4 +25,5 @@
     <string name="subject">тема:</string>
     <string name="mailer">отправитель:</string>
     <string name="problems_with_content">Возникли проблемы с загрузкой контента.</string>
+    <string name="unread_messages">Непрочитанные сообщения</string>
 </resources>

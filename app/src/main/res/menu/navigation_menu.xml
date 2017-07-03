@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/inbox_messages"
-        android:icon="@drawable/inbox"
-        android:title="@string/inbox_messages"/>
-    <item
-        android:id="@+id/outbox_messages"
-        android:icon="@drawable/outbox"
-        android:title="@string/outbox_messages"/>
-    <item
-        android:id="@+id/drafts"
-        android:icon="@drawable/drafts"
-        android:title="@string/drafts"/>
-    <item
-        android:id="@+id/recycle"
-        android:icon="@drawable/recycle"
-        android:title="@string/recycle"/>
+    <group
+        android:id="@+id/menuItems"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/unread_messages"
+            android:icon="@drawable/unread"
+            android:title="@string/unread_messages" />
+        <item
+            android:id="@+id/inbox_messages"
+            android:icon="@drawable/inbox"
+            android:title="@string/inbox_messages" />
+        <item
+            android:id="@+id/outbox_messages"
+            android:icon="@drawable/outbox"
+            android:title="@string/outbox_messages" />
+        <item
+            android:id="@+id/drafts"
+            android:icon="@drawable/drafts"
+            android:title="@string/drafts" />
+        <item
+            android:id="@+id/recycle"
+            android:icon="@drawable/recycle"
+            android:title="@string/recycle" />
+    </group>
 </menu>

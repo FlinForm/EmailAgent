@@ -3,56 +3,72 @@
     android:id="@+id/emailLetterMainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@drawable/layout_background"
+    android:orientation="vertical"
+    android:padding="15dp">
 
     <LinearLayout
         android:id="@+id/mailerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@drawable/layout_background"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/mailerLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginBottom="2dp"
+            android:paddingStart="5dp"
             android:text="@string/mailer"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/mailerContent"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textSize="18sp" />
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/letter_background"
+            android:padding="5dp"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/subjectLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@drawable/layout_background"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/subjectLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginBottom="2dp"
+            android:paddingStart="5dp"
             android:text="@string/subject"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/subjectContent"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textSize="18sp" />
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/letter_background"
+            android:padding="5dp"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/letterContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/letter_background"
         android:maxLines="@integer/google_play_services_version"
-        android:scrollbars="vertical"/>
+        android:padding="10dp"
+        android:scrollbars="vertical" />
 </LinearLayout>

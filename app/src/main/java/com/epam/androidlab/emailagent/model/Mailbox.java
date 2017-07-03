@@ -12,6 +12,7 @@ public class Mailbox {
     private static List<Message> trash = new ArrayList<>();
     private static List<Message> unRead = new ArrayList<>();
     private static Message message;
+    private static boolean linksReceived;
 
     private Mailbox() {
     }
@@ -42,5 +43,13 @@ public class Mailbox {
 
     public static void setMessage(Message message) {
         Mailbox.message = message;
+    }
+
+    public static boolean isLinksReceived() {
+        return linksReceived;
+    }
+
+    public static void setLinksReceived(boolean linksReceived) {
+        Mailbox.linksReceived = linksReceived;
     }
 }

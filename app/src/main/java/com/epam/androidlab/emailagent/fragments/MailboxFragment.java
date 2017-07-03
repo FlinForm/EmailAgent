@@ -29,12 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MailboxFragment extends Fragment implements View.OnScrollChangeListener {
-    private Uri MAILBOX_URI;
     private final String MESSAGE_ID = "messageId";
     private final String MESSAGE_SNIPPET = "snippet";
     private final String SENDER = "sender";
     private final String SUBJECT = "Subject";
     private final String MAILER = "From";
+    private Uri MAILBOX_URI;
 
     private String MAILBOX_IDENTIFIER_TAG = "identifier";
     private MailboxIdentifiers mailboxIdentifier;
@@ -70,6 +70,7 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
         progressDialog.setMessage(getString(R.string.progress_dialog_message));
 
         messages = new ArrayList<>();
+
         linearLayoutManager = new LinearLayoutManager(getContext());
 
         MailboxRecycleViewAdapter adapter = new MailboxRecycleViewAdapter(getActivity(), messages);
@@ -95,13 +96,14 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
         fab.setOnClickListener(event -> getActivity()
                 .getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.NEW_EMAIL_TAG)
+                .replace(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.EMAIL_FRAGMENT_TAG)
                 .commit());
 
     }
 
     @Override
     public void onDestroy() {
+        progressDialog.dismiss();
         super.onDestroy();
         //saveDataToDatabase();
     }

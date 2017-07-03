@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
+import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.google.api.services.gmail.model.Message;
-import com.google.api.services.gmail.model.MessagePartHeader;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ public class MailboxRecycleViewAdapter
     private final String EXCEPTION_TEXT = " must implement OnMailSelectedListener";
     private final String SUBJECT_TAG = "Subject";
     private final String INBOX_TAG = "INBOX";
+    private final String TRASH_TAG = "TRASH";
     private final String RECEIVER = "To";
     private final String MAILER = "From";
 
@@ -47,53 +48,50 @@ public class MailboxRecycleViewAdapter
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
         holder.MENU_ITEM_ID = position;
-        holder.mailerOrReceiver.setText(getMailerOrReceiver(messages.get(position)));
+        holder.mailerOrReceiver.setText(getReceiver(messages.get(position)));
         holder.subject.setText(getMessageSubject(messages.get(position)));
         holder.message = messages.get(position);
         if ("".equals(messages.get(position).getSnippet())) {
             holder.body.setText(R.string.no_content);
         } else {
-            holder.body.setText(messages.get(position).getSnippet());
+            holder.body.setText(formatCardText(messages.get(position).getSnippet(), false));
         }
     }
 
-    private String getMailerOrReceiver(Message message) {
-        String mailerOrReceiver;
-        String result = "";
+    private String formatCardText(String text, boolean isSubject) {
+        if (text == null) {
+            return null;
+        }
+        int textLength = 35;
+        if (isSubject) {
+            textLength = 25;
+        }
+        return text.length() < textLength + 5 ? text : text.substring(0, textLength) + " ...";
+    }
+
+    private String getReceiver(Message message) {
+        String receiver;
         if (isMailer(message)) {
-            mailerOrReceiver = MAILER;
+            receiver = MAILER;
         } else {
-            mailerOrReceiver = RECEIVER;
+            receiver = RECEIVER;
         }
-        for (MessagePartHeader partHeader : message.getPayload().getHeaders()) {
-            if (mailerOrReceiver.equals(partHeader.getName())) {
-                if ("".equals(partHeader.getValue())) {
-                    result = view.getResources().getString(R.string.no_content);
-                } else {
-                    result = partHeader.getValue();
-                }
-            }
-        }
-        return result;
+        String result = GmailApiHelper.getMessagePart(receiver, message);
+        return "".equals(result) ?
+                view.getResources().getString(R.string.no_content) :
+                formatCardText(result, false);
     }
 
     private String getMessageSubject(Message message) {
-        String subject = "";
-        for (MessagePartHeader partHeader : message.getPayload().getHeaders()) {
-            if (SUBJECT_TAG.equals(partHeader.getName())) {
-                if ("".equals(partHeader.getValue())) {
-                    subject = view.getResources().getString(R.string.no_content);
-                } else {
-                    subject = partHeader.getValue();
-                }
-            }
-        }
-        return subject;
+        String subject = GmailApiHelper.getMessagePart(SUBJECT_TAG, message);
+        return "".equals(subject) ?
+                view.getResources().getString(R.string.no_content) :
+                formatCardText(subject, true);
     }
 
     private boolean isMailer(Message message) {
         for (String labelId : message.getLabelIds()) {
-            if (INBOX_TAG.equalsIgnoreCase(labelId)) {
+            if (INBOX_TAG.equalsIgnoreCase(labelId) || TRASH_TAG.equals(labelId)) {
                 return true;
             }
         }
@@ -134,7 +132,6 @@ public class MailboxRecycleViewAdapter
         public void onClick(View v) {
             Mailbox.setMessage(message);
             listener.onLetterSelected();
-            System.out.println(message.getPayload().getHeaders());
         }
     }
 

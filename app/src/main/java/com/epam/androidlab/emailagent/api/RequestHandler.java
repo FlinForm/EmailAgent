@@ -10,6 +10,7 @@ import com.epam.androidlab.emailagent.activities.MainActivity;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePartHeader;
 
 
 import java.io.IOException;
@@ -106,7 +107,10 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                 if (messages == null | params.length < 2) {
                     return;
                 }
-                    apiRequests.batchRequest(service, myId, messages, params[1].toString());
+                apiRequests.batchRequest(service, myId, messages, params[1].toString());
+                for (MessagePartHeader messagePartHeader : messages.get(0).getPayload().getHeaders()) {
+                    System.out.println(messagePartHeader.getName() + " " + messagePartHeader.getValue());
+                }
                 break;
             case DELETE_MESSAGE:
                 if (messageId != null) {
