@@ -1,6 +1,5 @@
 package com.epam.androidlab.emailagent.fragments;
 
-import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.epam.androidlab.emailagent.R;
 import com.epam.androidlab.emailagent.activities.MainActivity;
@@ -23,12 +23,12 @@ import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
 import com.google.api.services.gmail.model.Message;
-import com.google.api.services.gmail.model.MessagePartHeader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MailboxFragment extends Fragment implements View.OnScrollChangeListener {
+public class MailboxFragment extends Fragment
+        implements View.OnScrollChangeListener, RequestHandler.OnDataChangedListener {
     private final String MESSAGE_ID = "messageId";
     private final String MESSAGE_SNIPPET = "snippet";
     private final String SENDER = "sender";
@@ -41,7 +41,7 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
     private List<Message> messages;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
 
     @Nullable
     @Override
@@ -54,7 +54,6 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             mailboxIdentifier =
@@ -66,8 +65,8 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
                         mailboxIdentifier.toString().toLowerCase());
         System.out.println(MAILBOX_URI.toString());
 
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage(getString(R.string.progress_dialog_message));
+        progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
+        System.out.println(progressBar == null);
 
         messages = new ArrayList<>();
 
@@ -81,13 +80,13 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
         recyclerView.setOnScrollChangeListener(this);
 
         if (GmailApiHelper.isDeviceOnline(getContext())) {
+            System.out.println(progressBar == null);
+            progressBar.setVisibility(View.VISIBLE);
             new RequestHandler(new GmailApiRequests(),
                     messages,
-                    progressDialog,
-                    recyclerView,
                     null,
-                    null
-            ).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
+                    null,
+                    this).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
         } else {
 
         }
@@ -96,16 +95,22 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
         fab.setOnClickListener(event -> getActivity()
                 .getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.EMAIL_FRAGMENT_TAG)
+                .addToBackStack(null)
+                .add(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.EMAIL_FRAGMENT_TAG)
                 .commit());
 
     }
 
     @Override
     public void onDestroy() {
-        progressDialog.dismiss();
         super.onDestroy();
         //saveDataToDatabase();
+    }
+
+    @Override
+    public void onDataChanged() {
+        progressBar.setVisibility(View.INVISIBLE);
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -113,21 +118,19 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
         String messageId = messages.get(item.getItemId()).getId();
         if (GmailApiHelper.isDeviceOnline(getContext())) {
             if (mailboxIdentifier.equals(MailboxIdentifiers.TRASH)) {
+                progressBar.setVisibility(View.VISIBLE);
                 new RequestHandler(new GmailApiRequests(),
                         messages,
-                        progressDialog,
-                        recyclerView,
                         null,
-                        messageId
-                ).execute(RequestType.DELETE_MESSAGE, null);
+                        messageId,
+                        this).execute(RequestType.DELETE_MESSAGE, null);
             } else {
+                progressBar.setVisibility(View.VISIBLE);
                 new RequestHandler(new GmailApiRequests(),
                         messages,
-                        progressDialog,
-                        recyclerView,
                         null,
-                        messageId
-                ).execute(RequestType.DELETE_MESSAGE, MailboxIdentifiers.TRASH);
+                        messageId,
+                        this).execute(RequestType.DELETE_MESSAGE, MailboxIdentifiers.TRASH);
             }
         }
         messages.remove(item.getItemId());
@@ -144,13 +147,12 @@ public class MailboxFragment extends Fragment implements View.OnScrollChangeList
          if (messages.size() < messageReferences.size()) {
             if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == messages.size() - 1) {
                 if (GmailApiHelper.isDeviceOnline(getContext())) {
+                    progressBar.setVisibility(View.VISIBLE);
                     new RequestHandler(new GmailApiRequests(),
                             messages,
-                            progressDialog,
-                            recyclerView,
                             null,
-                            null
-                    ).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
+                            null,
+                            this).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
                 }
             }
         }

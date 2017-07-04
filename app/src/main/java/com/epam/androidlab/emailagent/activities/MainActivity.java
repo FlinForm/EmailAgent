@@ -25,7 +25,6 @@ import com.google.api.services.gmail.GmailScopes;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +41,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +55,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class MainActivity extends AppCompatActivity
         implements EasyPermissions.PermissionCallbacks,
         NavigationView.OnNavigationItemSelectedListener,
-        MailboxRecycleViewAdapter.OnMailSelectedListener {
+        MailboxRecycleViewAdapter.OnMailSelectedListener,
+        RequestHandler.OnDataChangedListener {
 
     private final String MAILBOX_IDENTIFIER_TAG = "identifier";
     public static final String EMAIL_FRAGMENT_TAG = "NewEmailFragment";
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity
     private Fragment activeFragment;
     private FragmentTransaction transaction;
     private DrawerLayout drawerLayout;
-    private ProgressDialog mProgress;
+    private ProgressBar progressBar;
     private Toolbar toolBar;
     private boolean authCompleted;
 
@@ -93,13 +95,13 @@ public class MainActivity extends AppCompatActivity
                 .build()
         );
 
+        progressBar = (ProgressBar) findViewById(R.id.activityProgressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+
         toolBar = (Toolbar) findViewById(R.id.toolbar);
         toolBar.setTitle("");
         toolBar.inflateMenu(R.menu.new_email_tmenu);
         setSupportActionBar(toolBar);
-
-        mProgress = new ProgressDialog(this);
-        mProgress.setMessage(getString(R.string.progress_dialog_message));
 
         if (!Mailbox.isLinksReceived()) {
             credential = GoogleAccountCredential.usingOAuth2(
@@ -118,7 +120,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
-        mProgress.dismiss();
         super.onPause();
     }
 
@@ -130,6 +131,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onDataChanged() {
+        progressBar.setVisibility(View.INVISIBLE);
+        transaction = getSupportFragmentManager().beginTransaction();
+        Bundle bundle = new Bundle();
+        Fragment inboxFragment = new MailboxFragment();
+        bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.INBOX.toString());
+        inboxFragment.setArguments(bundle);
+        transaction.add(R.id.fragmentLayout,
+                inboxFragment,
+                MailboxIdentifiers.INBOX.toString()).commit();
+        activeFragment = inboxFragment;
     }
 
     /*private void init() {
@@ -162,7 +177,7 @@ public class MainActivity extends AppCompatActivity
                 Fragment inboxFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.INBOX.toString());
                 inboxFragment.setArguments(bundle);
-                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
+                transaction.replace(R.id.fragmentLayout,
                         inboxFragment,
                         MailboxIdentifiers.INBOX.toString());
                 activeFragment = inboxFragment;
@@ -171,7 +186,7 @@ public class MainActivity extends AppCompatActivity
                 Fragment outboxFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.SENT.toString());
                 outboxFragment.setArguments(bundle);
-                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
+                transaction.replace(R.id.fragmentLayout,
                         outboxFragment,
                         MailboxIdentifiers.SENT.toString());
                 activeFragment = outboxFragment;
@@ -180,7 +195,7 @@ public class MainActivity extends AppCompatActivity
                 Fragment draftsFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.DRAFT.toString());
                 draftsFragment.setArguments(bundle);
-                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
+                transaction.replace(R.id.fragmentLayout,
                         draftsFragment,
                         MailboxIdentifiers.DRAFT.toString());
                 activeFragment = draftsFragment;
@@ -189,7 +204,7 @@ public class MainActivity extends AppCompatActivity
                 Fragment recycleFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.TRASH.toString());
                 recycleFragment.setArguments(bundle);
-                transaction.addToBackStack(null).replace(R.id.fragmentLayout,
+                transaction.replace(R.id.fragmentLayout,
                         recycleFragment,
                         MailboxIdentifiers.TRASH.toString());
                 activeFragment = recycleFragment;
@@ -220,11 +235,7 @@ public class MainActivity extends AppCompatActivity
                 if (activeFragment == null) {
                     return false;
                 }
-
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragmentLayout,
-                                activeFragment)
-                        .commit();
+                getSupportFragmentManager().popBackStack();
                 break;
         }
         return true;
@@ -232,10 +243,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLetterSelected() {
-        transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentLayout,
-                new EmailLetterFragment(), EMAIL_FRAGMENT_TAG);
-        transaction.commit();
+        getSupportFragmentManager().beginTransaction()
+                .addToBackStack(null)
+                .add(R.id.fragmentLayout, new EmailLetterFragment(), EMAIL_FRAGMENT_TAG)
+                .commit();
     }
 
     public static Gmail getGmailService() {
@@ -252,7 +263,8 @@ public class MainActivity extends AppCompatActivity
                     getString(R.string.no_connection),
                     BaseTransientBottomBar.LENGTH_LONG).show();
         } else {
-            new RequestHandler(new GmailApiRequests(), null, mProgress, null, null, null)
+            progressBar.setVisibility(View.VISIBLE);
+            new RequestHandler(new GmailApiRequests(), null, null, null, this)
                     .execute(RequestType.GET_ALL_REFERENCES);
         }
     }

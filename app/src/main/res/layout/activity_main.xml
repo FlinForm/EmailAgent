@@ -17,11 +17,20 @@
         android:layout_gravity="left"
         tools:openDrawer="start">
 
-        <FrameLayout
+        <RelativeLayout
             android:id="@+id/fragmentLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp" />
+            android:layout_height="match_parent"
+            android:layout_margin="10dp">
+
+            <ProgressBar
+                android:id="@+id/activityProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
 
         <android.support.design.widget.NavigationView app:theme="@style/NavStyle"
             android:id="@+id/navigation_view"

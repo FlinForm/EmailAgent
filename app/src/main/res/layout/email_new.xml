@@ -1,54 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/mainLayout"
+    android:id="@+id/newEmailMainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@drawable/layout_background"
+    android:orientation="vertical"
+    android:padding="15dp">
 
     <LinearLayout
         android:id="@+id/receiverLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@drawable/layout_background"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/receiver"
-            android:layout_width="80dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/receiver" />
+            android:layout_marginBottom="2dp"
+            android:paddingStart="5dp"
+            android:text="@string/receiver"
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/receiverName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="textEmailAddress" />
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/letter_background"
+            android:padding="5dp"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/subjectLayout"
+        android:id="@+id/subjectNewLetterLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@drawable/layout_background"
+        android:padding="5dp"
+        android:layout_marginBottom="10dp"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/subject"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/subject_text" />
-
-        <EditText
-            android:id="@+id/subjectText"
+            android:id="@+id/subjectNewLetter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="textPersonName" />
+            android:layout_marginBottom="2dp"
+            android:paddingStart="5dp"
+            android:text="@string/subject"
+            android:textSize="16sp" />
 
+        <EditText
+            android:id="@+id/subjectNewLetterText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:background="@drawable/letter_background"
+            android:padding="5dp"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <RelativeLayout

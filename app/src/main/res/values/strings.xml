@@ -3,7 +3,7 @@
     <string name="api_button">Call gmail api</string>
     <string name="test_button">Test button %s</string>
     <string name="subject_text">SUBJECT:</string>
-    <string name="receiver">RECEIVER:</string>
+    <string name="receiver">receiver:</string>
     <string name="no_connection">No network connection available.</string>
     <string name="calling_api">Calling Gmail API ...</string>
     <string name="quickstart_api">Gmail API Android Quickstart</string>

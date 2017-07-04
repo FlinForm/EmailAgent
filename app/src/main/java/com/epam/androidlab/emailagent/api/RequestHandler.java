@@ -1,16 +1,11 @@
 package com.epam.androidlab.emailagent.api;
 
-import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.RecyclerView;
 
 import com.epam.androidlab.emailagent.activities.MainActivity;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.google.api.services.gmail.model.Message;
-import com.google.api.services.gmail.model.MessagePartHeader;
 
 
 import java.io.IOException;
@@ -22,31 +17,26 @@ import javax.mail.internet.MimeMessage;
 
 public class RequestHandler extends AsyncTask<Object, Void, Void> {
     private final String INBOX_QUERY = "INBOX";
-    private final String DRAFTS_QUERY = "DRAFT";
-    private final String TRASH_QUERY = "TRASH";
 
     private final String myId;
     private final MimeMessage mimeMessage;
     private final String messageId;
     private com.google.api.services.gmail.Gmail service;
+    public OnDataChangedListener listener;
     private ApiRequests apiRequests;
     private List<Message> messages;
     private List<String> queries;
     private RequestType request;
-    private RecyclerView recyclerView;
-    private ProgressDialog progressDialog;
 
     public RequestHandler(ApiRequests apiRequests,
                           List<Message> messages,
-                          ProgressDialog progressDialog,
-                          RecyclerView recyclerView,
                           MimeMessage mimeMessage,
-                          String messageId) {
+                          String messageId,
+                          OnDataChangedListener listener) {
+        this.listener = listener;
         this.apiRequests = apiRequests;
         this.messages = messages;
         service = MainActivity.getGmailService();
-        this.progressDialog = progressDialog;
-        this.recyclerView = recyclerView;
         this.mimeMessage = mimeMessage;
         this.messageId = messageId;
         queries = new ArrayList<>();
@@ -54,22 +44,9 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     }
 
     @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-        if (progressDialog != null) {
-            progressDialog.show();
-        }
-    }
-
-    @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        if (progressDialog != null) {
-            progressDialog.hide();
-        }
-        if (recyclerView != null) {
-            recyclerView.getAdapter().notifyDataSetChanged();
-        }
+        listener.onDataChanged();
     }
 
     @Override
@@ -108,9 +85,6 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     return;
                 }
                 apiRequests.batchRequest(service, myId, messages, params[1].toString());
-                for (MessagePartHeader messagePartHeader : messages.get(0).getPayload().getHeaders()) {
-                    System.out.println(messagePartHeader.getName() + " " + messagePartHeader.getValue());
-                }
                 break;
             case DELETE_MESSAGE:
                 if (messageId != null) {
@@ -149,5 +123,9 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
         queries.add(MailboxIdentifiers.TRASH.toString());
         apiRequests.getMessageReferences(service, myId, queries);
         queries.clear();
+    }
+
+    public interface OnDataChangedListener {
+        void onDataChanged();
     }
 }

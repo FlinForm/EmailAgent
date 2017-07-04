@@ -26,7 +26,6 @@ import javax.mail.internet.MimeMessage;
 public class NewEmailFragment extends Fragment {
     private GoogleAccountCredential credential;
     private EditText emailBody, receiver, subject;
-    private boolean isEmailSent;
 
     @Nullable
     @Override
@@ -44,10 +43,9 @@ public class NewEmailFragment extends Fragment {
         getActivity().invalidateOptionsMenu();
 
         credential = MainActivity.getCredential();
-        isEmailSent = false;
 
         receiver = (EditText) view.findViewById(R.id.receiverName);
-        subject = (EditText) view.findViewById(R.id.subjectText);
+        subject = (EditText) view.findViewById(R.id.subjectNewLetterText);
         emailBody = (EditText) view.findViewById(R.id.emailBody);
 
         View fab = view.findViewById(R.id.fabEmailFragment);
@@ -79,13 +77,10 @@ public class NewEmailFragment extends Fragment {
                             emailBody.getText().toString());
             new RequestHandler(new GmailApiRequests(),
                     null,
-                    null,
-                    null,
                     mimeMessage,
-                    null)
+                    null, null)
                     .execute(RequestType.SEND_EMAIL);
         }
-        isEmailSent = true;
         getFragmentManager().beginTransaction().remove(this).commit();
     }
 }

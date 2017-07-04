@@ -6,6 +6,7 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
@@ -16,6 +17,8 @@ import java.util.List;
 
 public class MailboxRecycleViewAdapter
         extends RecyclerView.Adapter<MailboxRecycleViewAdapter.ItemViewHolder> {
+    private final int VIEW_TYPE_ITEM = 0;
+    private final int VIEW_TYPE_LOADING = 1;
     private final List<Message> messages;
     private final String EXCEPTION_TEXT = " must implement OnMailSelectedListener";
     private final String SUBJECT_TAG = "Subject";
@@ -101,6 +104,16 @@ public class MailboxRecycleViewAdapter
     @Override
     public int getItemCount() {
         return messages.size();
+    }
+
+
+    private class LoadingViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
+
+        public LoadingViewHolder(View view) {
+            super(view);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBarRecycle);
+        }
     }
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder
