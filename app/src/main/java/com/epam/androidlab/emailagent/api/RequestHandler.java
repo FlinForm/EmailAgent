@@ -6,6 +6,7 @@ import com.epam.androidlab.emailagent.activities.MainActivity;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.MessagePartHeader;
 
 
 import java.io.IOException;

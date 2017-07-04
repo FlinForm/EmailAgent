@@ -4,7 +4,6 @@
     android:id="@+id/activityMainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryLight"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
@@ -20,8 +19,7 @@
         <RelativeLayout
             android:id="@+id/fragmentLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp">
+            android:layout_height="match_parent">
 
             <ProgressBar
                 android:id="@+id/activityProgressBar"

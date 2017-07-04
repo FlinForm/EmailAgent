@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -63,7 +64,6 @@ public class MailboxFragment extends Fragment
         MAILBOX_URI =
                 Uri.parse("content://com.epam.androidlab.emailagent.provider/" +
                         mailboxIdentifier.toString().toLowerCase());
-        System.out.println(MAILBOX_URI.toString());
 
         progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
         System.out.println(progressBar == null);
@@ -73,11 +73,14 @@ public class MailboxFragment extends Fragment
         linearLayoutManager = new LinearLayoutManager(getContext());
 
         MailboxRecycleViewAdapter adapter = new MailboxRecycleViewAdapter(getActivity(), messages);
-
         recyclerView = (RecyclerView) view.findViewById(R.id.recycleView);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.setOnScrollChangeListener(this);
+        DividerItemDecoration dividerItemDecoration =
+                new DividerItemDecoration(recyclerView.getContext(),
+                linearLayoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         if (GmailApiHelper.isDeviceOnline(getContext())) {
             System.out.println(progressBar == null);

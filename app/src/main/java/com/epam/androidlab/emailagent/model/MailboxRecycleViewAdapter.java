@@ -1,32 +1,29 @@
 package com.epam.androidlab.emailagent.model;
 
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
 import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.google.api.services.gmail.model.Message;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 public class MailboxRecycleViewAdapter
         extends RecyclerView.Adapter<MailboxRecycleViewAdapter.ItemViewHolder> {
-    private final int VIEW_TYPE_ITEM = 0;
-    private final int VIEW_TYPE_LOADING = 1;
     private final List<Message> messages;
     private final String EXCEPTION_TEXT = " must implement OnMailSelectedListener";
-    private final String SUBJECT_TAG = "Subject";
-    private final String INBOX_TAG = "INBOX";
-    private final String TRASH_TAG = "TRASH";
-    private final String RECEIVER = "To";
-    private final String MAILER = "From";
 
+    private AdapterHelper helper;
     private View view;
     public static OnMailSelectedListener listener;
 
@@ -44,61 +41,31 @@ public class MailboxRecycleViewAdapter
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         view = LayoutInflater.from(parent
                 .getContext())
-                .inflate(R.layout.email_card, parent, false);
+                .inflate(R.layout.material_card, parent, false);
+        helper = new AdapterHelper(view);
         return new ItemViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
+        Message message = messages.get(position);
         holder.MENU_ITEM_ID = position;
-        holder.mailerOrReceiver.setText(getReceiver(messages.get(position)));
-        holder.subject.setText(getMessageSubject(messages.get(position)));
-        holder.message = messages.get(position);
-        if ("".equals(messages.get(position).getSnippet())) {
+        holder.mailerOrReceiver
+                .setText(helper.formatReceiverText(helper.getReceiver(message)));
+        holder.subject
+                .setText(helper.getMessageSubject(message));
+        holder.message = message;
+        if ("".equals(message.getSnippet())) {
             holder.body.setText(R.string.no_content);
         } else {
-            holder.body.setText(formatCardText(messages.get(position).getSnippet(), false));
+            holder.body.setText(helper.formatCardText(message.getSnippet()));
         }
-    }
-
-    private String formatCardText(String text, boolean isSubject) {
-        if (text == null) {
-            return null;
-        }
-        int textLength = 35;
-        if (isSubject) {
-            textLength = 25;
-        }
-        return text.length() < textLength + 5 ? text : text.substring(0, textLength) + " ...";
-    }
-
-    private String getReceiver(Message message) {
-        String receiver;
-        if (isMailer(message)) {
-            receiver = MAILER;
-        } else {
-            receiver = RECEIVER;
-        }
-        String result = GmailApiHelper.getMessagePart(receiver, message);
-        return "".equals(result) ?
-                view.getResources().getString(R.string.no_content) :
-                formatCardText(result, false);
-    }
-
-    private String getMessageSubject(Message message) {
-        String subject = GmailApiHelper.getMessagePart(SUBJECT_TAG, message);
-        return "".equals(subject) ?
-                view.getResources().getString(R.string.no_content) :
-                formatCardText(subject, true);
-    }
-
-    private boolean isMailer(Message message) {
-        for (String labelId : message.getLabelIds()) {
-            if (INBOX_TAG.equalsIgnoreCase(labelId) || TRASH_TAG.equals(labelId)) {
-                return true;
-            }
-        }
-        return false;
+        holder.date.setText(helper.parseDate(helper.getDate(message)));
+        helper.setImageViewColor(helper.getReceiver(message).substring(0, 1).toLowerCase(),
+                holder.imageView);
+        helper.setImageViewText(helper.getReceiver(message).substring(0, 2),
+                holder.imageViewText);
+        helper.parseDate("Thu, 09 Feb 2017 13:43:58 +0000");
     }
 
     @Override
@@ -106,21 +73,14 @@ public class MailboxRecycleViewAdapter
         return messages.size();
     }
 
-
-    private class LoadingViewHolder extends RecyclerView.ViewHolder {
-        public ProgressBar progressBar;
-
-        public LoadingViewHolder(View view) {
-            super(view);
-            progressBar = (ProgressBar) view.findViewById(R.id.progressBarRecycle);
-        }
-    }
-
     public static class ItemViewHolder extends RecyclerView.ViewHolder
-    implements View.OnCreateContextMenuListener, View.OnClickListener {
+            implements View.OnCreateContextMenuListener, View.OnClickListener {
         private final TextView mailerOrReceiver;
         private final TextView subject;
         private final TextView body;
+        private final TextView date;
+        private final ImageView imageView;
+        private final TextView imageViewText;
         private int MENU_ITEM_ID;
         private Message message;
 
@@ -129,6 +89,9 @@ public class MailboxRecycleViewAdapter
             mailerOrReceiver = (TextView) itemView.findViewById(R.id.mailer);
             subject = (TextView) itemView.findViewById(R.id.subject);
             body = (TextView) itemView.findViewById(R.id.body);
+            date = (TextView) itemView.findViewById(R.id.date);
+            imageView = (ImageView) itemView.findViewById(R.id.cardImageView);
+            imageViewText = (TextView) itemView.findViewById(R.id.imageViewText);
 
             itemView.setOnCreateContextMenuListener(this);
             itemView.setOnClickListener(this);
