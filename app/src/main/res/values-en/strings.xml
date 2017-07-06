@@ -2,8 +2,8 @@
     <string name="app_name">Email Agent</string>
     <string name="api_button">Call gmail api</string>
     <string name="test_button">Test button %s</string>
-    <string name="subject_text">SUBJECT:</string>
-    <string name="receiver">receiver:</string>
+    <string name="subject_text">Subject</string>
+    <string name="receiver">Receiver</string>
     <string name="no_connection">No network connection available.</string>
     <string name="calling_api">Calling Gmail API ...</string>
     <string name="quickstart_api">Gmail API Android Quickstart</string>
@@ -26,4 +26,8 @@
     <string name="mailer">mailer:</string>
     <string name="problems_with_content">There are some problems with loading message content.</string>
     <string name="unread_messages">Unread messages</string>
+    <string name="new_letter">New Letter</string>
+    <string name="write_new_email">Write new email</string>
+    <string name="attach_file">Attach file</string>
+    <string name="send_message">Send message</string>
 </resources>

@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class AdapterHelper {
+public class AdapterUtils {
     private final String SUBJECT_TAG = "Subject";
     private final String INBOX_TAG = "INBOX";
     private final String TRASH_TAG = "TRASH";
@@ -25,16 +25,15 @@ public class AdapterHelper {
     private final String MAILER = "From";
     private View view;
 
-    public AdapterHelper(View view) {
+    public AdapterUtils(View view) {
         this.view = view;
     }
 
     public String formatCardText(String text) {
         if (text == null) {
-            return null;
+            return "draft";
         }
         int textLength = 32;
-
         return text.length() < textLength + 5 ? text : text.substring(0, textLength) + " ...";
     }
 
@@ -95,6 +94,11 @@ public class AdapterHelper {
     }
 
     public void setImageViewColor(String firstLetter, ImageView imageView) {
+
+        if ("draft".equals(firstLetter)) {
+            imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+                    R.color.colorPink));
+        }
 
         if (firstLetter.matches("[a-e]") || firstLetter.matches("[а-е]")) {
             imageView.setColorFilter(ContextCompat.getColor(view.getContext(),

@@ -37,17 +37,19 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
         this.listener = listener;
         this.apiRequests = apiRequests;
         this.messages = messages;
-        service = MainActivity.getGmailService();
         this.mimeMessage = mimeMessage;
         this.messageId = messageId;
         queries = new ArrayList<>();
         myId = "me";
+        service = GmailApiHelper.gmailService;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        listener.onDataChanged();
+        if (mimeMessage == null) {
+            listener.onDataChanged();
+        }
     }
 
     @Override
@@ -86,6 +88,9 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     return;
                 }
                 apiRequests.batchRequest(service, myId, messages, params[1].toString());
+                /*for (MessagePartHeader header : messages.get(0).getPayload().getHeaders()) {
+                    System.out.println(header.getName() + "--------------" + header.getValue());
+                }*/
                 break;
             case DELETE_MESSAGE:
                 if (messageId != null) {

@@ -105,6 +105,7 @@ public class GmailApiRequests implements ApiRequests {
             throws MessagingException, IOException {
         Message message = makeMessageFromMimeMessage(email);
         message = service.users().messages().send(userId, message).execute();
+        Mailbox.getOutboxMessages().add(message);
         return message;
     }
 

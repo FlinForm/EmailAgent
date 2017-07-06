@@ -3,6 +3,7 @@ package com.epam.androidlab.emailagent.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
@@ -24,6 +27,7 @@ public class EmailLetterFragment extends Fragment {
     private final String MAILER = "From";
     private final String SUBJECT = "Subject";
     private TextView mailer, subject, emailBody;
+    private WebView webView;
 
     @Nullable
     @Override
@@ -41,8 +45,9 @@ public class EmailLetterFragment extends Fragment {
 
         mailer = (TextView) view.findViewById(R.id.mailerContent);
         subject = (TextView) view.findViewById(R.id.subjectContent);
-        emailBody = (TextView) view.findViewById(R.id.letterContent);
-        emailBody.setMovementMethod(new ScrollingMovementMethod());
+        //emailBody = (TextView) view.findViewById(R.id.letterContent);
+        //emailBody.setMovementMethod(new ScrollingMovementMethod());
+        webView = (WebView) view.findViewById(R.id.webView);
         fillTextViews();
     }
 
@@ -81,10 +86,13 @@ public class EmailLetterFragment extends Fragment {
                 return;
             } else {
                 String body = new String(bodyBytes, "UTF-8");
-                emailBody.setText(body);
+                //emailBody.setText(body);
+                webView.loadUrl("https://developer.android.com/");
+
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 }
+

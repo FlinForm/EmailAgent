@@ -44,7 +44,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import java.util.Arrays;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity
         RequestHandler.OnDataChangedListener {
 
     private final String MAILBOX_IDENTIFIER_TAG = "identifier";
-    public static final String EMAIL_FRAGMENT_TAG = "NewEmailFragment";
 
     private static final int REQUEST_ACCOUNT_PICKER = 1000;
     private static final int REQUEST_AUTHORIZATION = 1001;
@@ -67,33 +65,20 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = {GmailScopes.GMAIL_LABELS,
-            GmailScopes.GMAIL_COMPOSE,
-            GmailScopes.GMAIL_INSERT,
-            GmailScopes.GMAIL_MODIFY,
-            GmailScopes.GMAIL_READONLY,
-            GmailScopes.MAIL_GOOGLE_COM};
 
-    private static com.google.api.services.gmail.Gmail gmailService = null;
-    private static GoogleAccountCredential credential;
-
-    private Fragment activeFragment;
     private FragmentTransaction transaction;
     private DrawerLayout drawerLayout;
     private ProgressBar progressBar;
     private Toolbar toolBar;
-    private boolean authCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
                 .setFontAttrId(R.attr.fontPath)
-                .build()
-        );
+                .build());
 
         progressBar = (ProgressBar) findViewById(R.id.activityProgressBar);
         progressBar.setVisibility(View.INVISIBLE);
@@ -104,10 +89,8 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolBar);
 
         if (!Mailbox.isLinksReceived()) {
-            credential = GoogleAccountCredential.usingOAuth2(
-                    getApplicationContext(), Arrays.asList(SCOPES))
-                    .setBackOff(new ExponentialBackOff());
-            initGmailService();
+            GmailApiHelper.initCredential(this);
+            GmailApiHelper.initGmailService();
             getResultsFromApi();
             Mailbox.setLinksReceived(true);
         }
@@ -144,30 +127,8 @@ public class MainActivity extends AppCompatActivity
         transaction.add(R.id.fragmentLayout,
                 inboxFragment,
                 MailboxIdentifiers.INBOX.toString()).commit();
-        activeFragment = inboxFragment;
     }
 
-    /*private void init() {
-        // Your Google Cloud Platform project ID
-        String projectId = ServiceOptions.getDefaultProjectId();
-
-        // Your topic ID
-        String topicId = "my-new-topic";
-
-        // Create a new topic
-        TopicName topic = TopicName.create(projectId, topicId);
-        try (TopicAdminClient topicAdminClient = TopicAdminClient.create()) {
-            topicAdminClient.createTopic(topic);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        System.out.printf("Topic %s:%s created.\n", topic.getProject(), topic.getTopic());
-    }*/
-
-    // Sometimes replacing fragments don't work.
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         transaction = getSupportFragmentManager().beginTransaction();
@@ -180,7 +141,6 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.fragmentLayout,
                         inboxFragment,
                         MailboxIdentifiers.INBOX.toString());
-                activeFragment = inboxFragment;
                 break;
             case R.id.outbox_messages:
                 Fragment outboxFragment = new MailboxFragment();
@@ -189,7 +149,6 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.fragmentLayout,
                         outboxFragment,
                         MailboxIdentifiers.SENT.toString());
-                activeFragment = outboxFragment;
                 break;
             case R.id.drafts:
                 Fragment draftsFragment = new MailboxFragment();
@@ -198,7 +157,6 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.fragmentLayout,
                         draftsFragment,
                         MailboxIdentifiers.DRAFT.toString());
-                activeFragment = draftsFragment;
                 break;
             case R.id.recycle:
                 Fragment recycleFragment = new MailboxFragment();
@@ -207,7 +165,6 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.fragmentLayout,
                         recycleFragment,
                         MailboxIdentifiers.TRASH.toString());
-                activeFragment = recycleFragment;
                 break;
         }
         drawerLayout.closeDrawer(Gravity.START);
@@ -232,9 +189,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             case R.id.move_back:
-                if (activeFragment == null) {
-                    return false;
-                }
                 getSupportFragmentManager().popBackStack();
                 break;
         }
@@ -245,18 +199,14 @@ public class MainActivity extends AppCompatActivity
     public void onLetterSelected() {
         getSupportFragmentManager().beginTransaction()
                 .addToBackStack(null)
-                .add(R.id.fragmentLayout, new EmailLetterFragment(), EMAIL_FRAGMENT_TAG)
+                .add(R.id.fragmentLayout, new EmailLetterFragment())
                 .commit();
-    }
-
-    public static Gmail getGmailService() {
-        return gmailService;
     }
 
     private void getResultsFromApi() {
         if (!GmailApiHelper.isGooglePlayServicesAvailable(this)) {
             acquireGooglePlayServices();
-        } else if (credential.getSelectedAccountName() == null) {
+        } else if (GmailApiHelper.credential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (!GmailApiHelper.isDeviceOnline(this)) {
             Snackbar.make(getCurrentFocus(),
@@ -269,15 +219,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void initGmailService() {
-        HttpTransport transport = AndroidHttp.newCompatibleTransport();
-        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        gmailService = new Gmail.Builder(
-                transport, jsonFactory, credential)
-                .setApplicationName(getString(R.string.quickstart_api))
-                .build();
-    }
-
     @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
@@ -285,11 +226,11 @@ public class MainActivity extends AppCompatActivity
             String accountName = getPreferences(Context.MODE_PRIVATE)
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
-                credential.setSelectedAccountName(accountName);
+                GmailApiHelper.credential.setSelectedAccountName(accountName);
                 getResultsFromApi();
             } else {
                 startActivityForResult(
-                        credential.newChooseAccountIntent(),
+                        GmailApiHelper.credential.newChooseAccountIntent(),
                         REQUEST_ACCOUNT_PICKER);
             }
         } else {
@@ -326,7 +267,7 @@ public class MainActivity extends AppCompatActivity
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
-                        credential.setSelectedAccountName(accountName);
+                        GmailApiHelper.credential.setSelectedAccountName(accountName);
                         getResultsFromApi();
                     }
                 }
@@ -376,9 +317,5 @@ public class MainActivity extends AppCompatActivity
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
-    }
-
-    public static GoogleAccountCredential getCredential() {
-        return credential;
     }
 }

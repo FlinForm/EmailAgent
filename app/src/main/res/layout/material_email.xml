@@ -4,25 +4,34 @@
     android:id="@+id/newEmailMainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/layout_background"
-    android:orientation="vertical"
-    android:padding="15dp">
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/new_email_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="@string/write_new_email"
+        app:titleTextColor="@color/colorIcons" />
 
     <LinearLayout
         android:id="@+id/receiverLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/layout_background"
-        android:padding="5dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical">
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <TextView
             android:id="@+id/receiver"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:paddingStart="5dp"
             android:text="@string/receiver"
             android:textSize="16sp" />
 
@@ -30,44 +39,52 @@
             android:id="@+id/receiverName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/letter_background"
-            android:padding="5dp"
-            android:textSize="14sp" />
+            android:layout_marginLeft="8dp"
+            android:textColor="@color/colorPrimaryText"
+            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/subjectNewLetterLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/layout_background"
-        android:padding="5dp"
-        android:layout_marginBottom="10dp"
-        android:orientation="vertical">
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <TextView
             android:id="@+id/subjectNewLetter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:paddingStart="5dp"
-            android:text="@string/subject"
+            android:text="@string/subject_text"
             android:textSize="16sp" />
 
         <EditText
             android:id="@+id/subjectNewLetterText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:background="@drawable/letter_background"
-            android:padding="5dp"
-            android:textSize="14sp" />
+            android:layout_marginLeft="8dp"
+            android:textSize="16sp" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/fileImageLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:orientation="vertical"></LinearLayout>
 
     <RelativeLayout
         android:id="@+id/emailBodyLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp">
 
         <EditText
             android:id="@+id/emailBody"
@@ -76,18 +93,6 @@
             android:ems="10"
             android:gravity="top"
             android:inputType="textMultiLine"
-            android:text="Wow" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fabEmailFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="25dp"
-            android:clickable="true"
-            android:tint="@color/colorIcons"
-            app:fabSize="normal"
-            app:srcCompat="@drawable/send_email" />
+            android:text="message" />
     </RelativeLayout>
 </LinearLayout>

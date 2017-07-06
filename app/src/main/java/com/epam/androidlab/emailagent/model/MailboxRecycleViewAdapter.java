@@ -1,7 +1,6 @@
 package com.epam.androidlab.emailagent.model;
 
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -11,10 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
-import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.google.api.services.gmail.model.Message;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -23,7 +19,7 @@ public class MailboxRecycleViewAdapter
     private final List<Message> messages;
     private final String EXCEPTION_TEXT = " must implement OnMailSelectedListener";
 
-    private AdapterHelper helper;
+    private AdapterUtils helper;
     private View view;
     public static OnMailSelectedListener listener;
 
@@ -42,7 +38,7 @@ public class MailboxRecycleViewAdapter
         view = LayoutInflater.from(parent
                 .getContext())
                 .inflate(R.layout.material_card, parent, false);
-        helper = new AdapterHelper(view);
+        helper = new AdapterUtils(view);
         return new ItemViewHolder(view);
     }
 

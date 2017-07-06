@@ -2,8 +2,8 @@
     <string name="app_name">Email Клиент</string>
     <string name="api_button">Вызвать gmail api</string>
     <string name="test_button">Test button %s</string>
-    <string name="subject_text">Тема:</string>
-    <string name="receiver">получатель:</string>
+    <string name="subject_text">Тема</string>
+    <string name="receiver">Получатель</string>
     <string name="no_connection">Проверьте соединение с сетью.</string>
     <string name="calling_api">Вызов Gmail API ...</string>
     <string name="quickstart_api">Gmail API Android Quickstart</string>
@@ -26,4 +26,8 @@
     <string name="mailer">отправитель:</string>
     <string name="problems_with_content">Возникли проблемы с загрузкой контента.</string>
     <string name="unread_messages">Непрочитанные сообщения</string>
+    <string name="new_letter">Новое письмо</string>
+    <string name="write_new_email">Написать письмо</string>
+    <string name="attach_file">Прикрепить файл</string>
+    <string name="send_message">Отправить сообщение</string>
 </resources>

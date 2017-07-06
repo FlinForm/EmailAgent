@@ -1,6 +1,7 @@
 package com.epam.androidlab.emailagent.fragments;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import android.widget.ProgressBar;
 
 import com.epam.androidlab.emailagent.R;
 import com.epam.androidlab.emailagent.activities.MainActivity;
+import com.epam.androidlab.emailagent.activities.NewEmailActivity;
 import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
@@ -66,7 +68,6 @@ public class MailboxFragment extends Fragment
                         mailboxIdentifier.toString().toLowerCase());
 
         progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
-        System.out.println(progressBar == null);
 
         messages = new ArrayList<>();
 
@@ -83,7 +84,6 @@ public class MailboxFragment extends Fragment
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         if (GmailApiHelper.isDeviceOnline(getContext())) {
-            System.out.println(progressBar == null);
             progressBar.setVisibility(View.VISIBLE);
             new RequestHandler(new GmailApiRequests(),
                     messages,
@@ -95,13 +95,10 @@ public class MailboxFragment extends Fragment
         }
 
         View fab = view.findViewById(R.id.recycleFab);
-        fab.setOnClickListener(event -> getActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.fragmentLayout, new NewEmailFragment(), MainActivity.EMAIL_FRAGMENT_TAG)
-                .commit());
-
+        fab.setOnClickListener(event -> {
+            Intent intent = new Intent(getContext(), NewEmailActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override

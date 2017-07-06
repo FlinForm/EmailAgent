@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!--
+    <item
+        android:id="@+id/move_back"
+        android:icon="@drawable/back_arrow"
+        android:title="@string/back_arrow_name"
+        app:showAsAction="always"/>
+    -->
+
+    <item
+        android:id="@+id/attach_file"
+        android:icon="@drawable/attachmnt"
+        android:title="@string/attach_file"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/send_message"
+        android:icon="@drawable/send_email"
+        android:title="@string/send_message"
+        app:showAsAction="always" />
+</menu>
