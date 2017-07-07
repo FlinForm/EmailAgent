@@ -1,14 +1,19 @@
 package com.epam.androidlab.emailagent.activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
@@ -19,13 +24,24 @@ import com.google.api.services.gmail.model.Message;
 
 import java.io.UnsupportedEncodingException;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
+
 public class LetterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.material_letter);
-        fillCard(Mailbox.getMessage());
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
+
+        Toolbar toolBar = (Toolbar) findViewById(R.id.letter_toolbar);
+        toolBar.setTitle("");
+        setSupportActionBar(toolBar);
 
         WebView myWebView = (WebView) findViewById(R.id.materialWebView);
         WebSettings webSettings = myWebView.getSettings();
@@ -35,16 +51,24 @@ public class LetterActivity extends AppCompatActivity {
                 Mailbox.getMessage().getPayload().getMimeType(),
                 "UTF-8");
 
+        fillCard(Mailbox.getMessage());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.new_email_tmenu, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        finish();
+        return true;
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private String getMessageBody(Message message) {
