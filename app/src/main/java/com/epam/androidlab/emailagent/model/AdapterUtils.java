@@ -1,5 +1,6 @@
 package com.epam.androidlab.emailagent.model;
 
+import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,7 +15,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class AdapterUtils {
@@ -23,10 +23,10 @@ public class AdapterUtils {
     private final String TRASH_TAG = "TRASH";
     private final String RECEIVER = "To";
     private final String MAILER = "From";
-    private View view;
+    private Context context;
 
-    public AdapterUtils(View view) {
-        this.view = view;
+    public AdapterUtils(Context context) {
+        this.context = context;
     }
 
     public String formatCardText(String text) {
@@ -46,7 +46,7 @@ public class AdapterUtils {
         }
         String result = GmailApiHelper.getMessagePart(receiver, message);
         return "".equals(result) ?
-                view.getResources().getString(R.string.no_content) :
+                context.getResources().getString(R.string.no_content) :
                 formatCardText(result);
     }
 
@@ -58,7 +58,7 @@ public class AdapterUtils {
     public String getMessageSubject(Message message) {
         String subject = GmailApiHelper.getMessagePart(SUBJECT_TAG, message);
         return "".equals(subject) ?
-                view.getResources().getString(R.string.no_content) :
+                context.getResources().getString(R.string.no_content) :
                 formatCardText(subject);
     }
 
@@ -96,41 +96,41 @@ public class AdapterUtils {
     public void setImageViewColor(String firstLetter, ImageView imageView) {
 
         if ("draft".equals(firstLetter)) {
-            imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+            imageView.setColorFilter(ContextCompat.getColor(context,
                     R.color.colorPink));
         }
 
         if (firstLetter.matches("[a-e]") || firstLetter.matches("[а-е]")) {
-            imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+            imageView.setColorFilter(ContextCompat.getColor(context,
                     R.color.colorDeepPurple));
             return;
         }
 
         if (firstLetter.matches("[f-k]") || firstLetter.matches("[ж-л]")) {
-            imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+            imageView.setColorFilter(ContextCompat.getColor(context,
                     R.color.colorRed));
             return;
         }
 
         if (firstLetter.matches("[l-p]") || firstLetter.matches("[м-с]")) {
-            imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+            imageView.setColorFilter(ContextCompat.getColor(context,
                     R.color.colorGreen));
             return;
         }
 
         if (firstLetter.matches("[q-u]") || firstLetter.matches("[т-ц]")) {
-            imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+            imageView.setColorFilter(ContextCompat.getColor(context,
                     R.color.colorAmber));
             return;
         }
 
         if (firstLetter.matches("[v-z]") || firstLetter.matches("[ч-я]")) {
-            imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+            imageView.setColorFilter(ContextCompat.getColor(context,
                     R.color.colorIndigo));
             return;
         }
 
-        imageView.setColorFilter(ContextCompat.getColor(view.getContext(),
+        imageView.setColorFilter(ContextCompat.getColor(context,
                 R.color.colorPink));
     }
 

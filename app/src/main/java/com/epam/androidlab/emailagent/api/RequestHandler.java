@@ -88,9 +88,9 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     return;
                 }
                 apiRequests.batchRequest(service, myId, messages, params[1].toString());
-                /*for (MessagePartHeader header : messages.get(0).getPayload().getHeaders()) {
-                    System.out.println(header.getName() + "--------------" + header.getValue());
-                }*/
+                for (Message message : messages) {
+                    System.out.println(message.getPayload().getMimeType());
+                }
                 break;
             case DELETE_MESSAGE:
                 if (messageId != null) {

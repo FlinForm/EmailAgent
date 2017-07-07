@@ -5,22 +5,11 @@ import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
 import com.epam.androidlab.emailagent.api.RequestHandler;
 import com.epam.androidlab.emailagent.api.RequestType;
-import com.epam.androidlab.emailagent.fragments.EmailLetterFragment;
 import com.epam.androidlab.emailagent.fragments.MailboxFragment;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.ExponentialBackOff;
-
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.GmailScopes;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -197,10 +186,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLetterSelected() {
-        getSupportFragmentManager().beginTransaction()
-                .addToBackStack(null)
-                .add(R.id.fragmentLayout, new EmailLetterFragment())
-                .commit();
+        Intent intent = new Intent(this, LetterActivity.class);
+        startActivity(intent);
     }
 
     private void getResultsFromApi() {

@@ -38,7 +38,7 @@ public class MailboxRecycleViewAdapter
         view = LayoutInflater.from(parent
                 .getContext())
                 .inflate(R.layout.material_card, parent, false);
-        helper = new AdapterUtils(view);
+        helper = new AdapterUtils(view.getContext());
         return new ItemViewHolder(view);
     }
 
