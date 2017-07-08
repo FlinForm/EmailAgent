@@ -17,9 +17,6 @@ public interface ApiRequests {
 
     void trashMessage(Gmail service, String userId, String messageId) throws IOException;
 
-
-    Message getRawMesage(Gmail service, String userId, Message message) throws IOException;
-
     void deleteMessage(Gmail service, String userId, String messageId) throws IOException;
 
     Message sendEmail(Gmail service, String userId, MimeMessage email)

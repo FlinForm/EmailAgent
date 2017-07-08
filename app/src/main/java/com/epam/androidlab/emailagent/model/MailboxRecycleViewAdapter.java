@@ -61,7 +61,6 @@ public class MailboxRecycleViewAdapter
                 holder.imageView);
         helper.setImageViewText(helper.getReceiver(message).substring(0, 2),
                 holder.imageViewText);
-        helper.parseDate("Thu, 09 Feb 2017 13:43:58 +0000");
     }
 
     @Override

@@ -9,15 +9,19 @@ import com.epam.androidlab.emailagent.fragments.MailboxFragment;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
+import com.epam.androidlab.emailagent.services.MessageReceiver;
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import android.Manifest;
 import android.accounts.AccountManager;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.NavigationView;
@@ -68,6 +72,8 @@ public class MainActivity extends AppCompatActivity
                 .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
+
+        //startEmailService();
 
         progressBar = (ProgressBar) findViewById(R.id.activityProgressBar);
         progressBar.setVisibility(View.INVISIBLE);
@@ -153,6 +159,14 @@ public class MainActivity extends AppCompatActivity
                 recycleFragment.setArguments(bundle);
                 transaction.replace(R.id.fragmentLayout,
                         recycleFragment,
+                        MailboxIdentifiers.TRASH.toString());
+                break;
+            case R.id.unread_messages:
+                Fragment unreadFragment = new MailboxFragment();
+                bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.UNREAD.toString());
+                unreadFragment.setArguments(bundle);
+                transaction.replace(R.id.fragmentLayout,
+                        unreadFragment,
                         MailboxIdentifiers.TRASH.toString());
                 break;
         }
@@ -304,5 +318,17 @@ public class MainActivity extends AppCompatActivity
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
+    }
+
+    private void startEmailService() {
+        AlarmManager alarmManager;
+        PendingIntent pendingIntent;
+        alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, MessageReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(this, 0,
+                intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + 5000,
+                5000, pendingIntent);
     }
 }

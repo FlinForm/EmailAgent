@@ -2,11 +2,9 @@ package com.epam.androidlab.emailagent.api;
 
 import android.os.AsyncTask;
 
-import com.epam.androidlab.emailagent.activities.MainActivity;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.google.api.services.gmail.model.Message;
-import com.google.api.services.gmail.model.MessagePartHeader;
 
 
 import java.io.IOException;
@@ -26,7 +24,7 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     public OnDataChangedListener listener;
     private ApiRequests apiRequests;
     private List<Message> messages;
-    private List<String> queries;
+    private List<String> query;
     private RequestType request;
 
     public RequestHandler(ApiRequests apiRequests,
@@ -39,7 +37,7 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
         this.messages = messages;
         this.mimeMessage = mimeMessage;
         this.messageId = messageId;
-        queries = new ArrayList<>();
+        query = new ArrayList<>();
         myId = "me";
         service = GmailApiHelper.gmailService;
     }
@@ -69,14 +67,14 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     }
 
     private void handleRequest(Object... params) throws IOException, MessagingException {
-        queries.clear();
+        query.clear();
         switch (request) {
             case GET_ALL_REFERENCES:
                 getAllReferences();
                 break;
             case GET_MESSAGE_IDS:
-                queries.add(INBOX_QUERY);
-                apiRequests.getMessageReferences(service, myId, queries);
+                query.add(INBOX_QUERY);
+                apiRequests.getMessageReferences(service, myId, query);
                 break;
             case SEND_EMAIL:
                 if (mimeMessage != null) {
@@ -107,29 +105,28 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     }
 
     private void getAllReferences() throws IOException {
-        queries.add(MailboxIdentifiers.INBOX.toString());
-        apiRequests.getMessageReferences(service, myId, queries);
-        System.out.println(Mailbox.getInboxMessages().get(0).getSnippet());
-        queries.clear();
-        queries.add(MailboxIdentifiers.DRAFT.toString());
-        apiRequests.getMessageReferences(service, myId, queries);
-        queries.clear();
-        queries.add(MailboxIdentifiers.SENT.toString());
-        apiRequests.getMessageReferences(service, myId, queries);
-        queries.clear();
-        queries.add(MailboxIdentifiers.TRASH.toString());
-        apiRequests.getMessageReferences(service, myId, queries);
-        queries.clear();
-        /*queries.add(RequestType.UNREAD.toString());
-        apiRequests.getMessageReferences(service, myId, queries);
-        queries.clear();*/
+        query.add(MailboxIdentifiers.INBOX.toString());
+        apiRequests.getMessageReferences(service, myId, query);
+        query.clear();
+        query.add(MailboxIdentifiers.DRAFT.toString());
+        apiRequests.getMessageReferences(service, myId, query);
+        query.clear();
+        query.add(MailboxIdentifiers.SENT.toString());
+        apiRequests.getMessageReferences(service, myId, query);
+        query.clear();
+        query.add(MailboxIdentifiers.TRASH.toString());
+        apiRequests.getMessageReferences(service, myId, query);
+        query.clear();
+        query.add(MailboxIdentifiers.UNREAD.toString());
+        apiRequests.getMessageReferences(service, myId, query);
+        query.clear();
     }
 
     private void updateTrash() throws IOException {
         Mailbox.getTrash().clear();
-        queries.add(MailboxIdentifiers.TRASH.toString());
-        apiRequests.getMessageReferences(service, myId, queries);
-        queries.clear();
+        query.add(MailboxIdentifiers.TRASH.toString());
+        apiRequests.getMessageReferences(service, myId, query);
+        query.clear();
     }
 
     public interface OnDataChangedListener {

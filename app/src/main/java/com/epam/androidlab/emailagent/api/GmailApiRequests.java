@@ -8,8 +8,6 @@ import com.google.api.client.googleapis.json.GoogleJsonError;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Draft;
-import com.google.api.services.gmail.model.ListDraftsResponse;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
 
@@ -86,11 +84,6 @@ public class GmailApiRequests implements ApiRequests {
         batchRequest.execute();
     }
 
-    @Override
-    public Message getRawMesage(Gmail service, String userId, Message message) throws IOException {
-        return service.users().messages().get(userId, message.getId()).setFormat("raw").execute();
-    }
-
     //Finished
     @Override
     public void deleteMessage(Gmail service, String userId, String messageId) throws IOException {
@@ -136,7 +129,7 @@ public class GmailApiRequests implements ApiRequests {
             case TRASH:
                 return Mailbox.getTrash();
             case UNREAD:
-                return null;
+                return Mailbox.getUnRead();
         }
         return null;
     }

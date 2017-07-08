@@ -51,7 +51,7 @@ public class LetterActivity extends AppCompatActivity {
         webView.loadData(getMessageBody(Mailbox.getMessage()),
                 "text/html; charset=utf-8",
                 null);
-        
+
         fillCard(Mailbox.getMessage());
     }
 
@@ -88,12 +88,10 @@ public class LetterActivity extends AppCompatActivity {
                     .getData());
         }
         String body = "";
-
         try {
             if (bodyBytes != null) {
                 body = new String(bodyBytes, "UTF-8");
             }
-            System.out.println(body);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

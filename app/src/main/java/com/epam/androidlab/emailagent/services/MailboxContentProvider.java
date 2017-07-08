@@ -1,4 +1,4 @@
-package com.epam.androidlab.emailagent.provider;
+package com.epam.androidlab.emailagent.services;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
