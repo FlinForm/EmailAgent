@@ -4,11 +4,12 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -28,6 +29,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LetterActivity extends AppCompatActivity {
+    WebView webView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,13 +45,14 @@ public class LetterActivity extends AppCompatActivity {
         toolBar.setTitle("");
         setSupportActionBar(toolBar);
 
-        WebView myWebView = (WebView) findViewById(R.id.materialWebView);
-        WebSettings webSettings = myWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        myWebView.setWebViewClient(new WebViewClient());
-        myWebView.loadData(getMessageBody(Mailbox.getMessage()),
-                Mailbox.getMessage().getPayload().getMimeType(),
+        webView = (WebView) findViewById(R.id.materialWebView);
+        webView.setInitialScale(getScale());
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.loadData(getMessageBody(Mailbox.getMessage()),
+                "text/html",
                 "UTF-8");
+
+
 
         fillCard(Mailbox.getMessage());
     }
@@ -78,22 +81,26 @@ public class LetterActivity extends AppCompatActivity {
                     .getPayload()
                     .getBody()
                     .getData());
+            System.out.println(1);
         } else {
             bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
                     .getPayload()
                     .getParts()
-                    .get(0)
+                    .get(1)
                     .getBody()
                     .getData());
+            System.out.println(2);
         }
         String body = "";
 
         try {
-            body = new String(bodyBytes, "UTF-8");
+            if (bodyBytes != null) {
+                body = new String(bodyBytes, "UTF-8");
+            }
+            System.out.println(body);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
         return body;
     }
 
@@ -118,5 +125,14 @@ public class LetterActivity extends AppCompatActivity {
                 imageView);
         helper.setImageViewText(helper.getReceiver(message).substring(0, 2),
                 imageViewText);
+    }
+
+    private int getScale(){
+        Display display =
+                ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int width = display.getWidth();
+        Double val = new Double(width)/new Double(500);
+        val = val * 100d;
+        return val.intValue();
     }
 }

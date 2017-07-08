@@ -5,5 +5,6 @@ public enum RequestType {
     BATCH_REQUEST,
     SEND_EMAIL,
     DELETE_MESSAGE,
-    GET_ALL_REFERENCES
+    GET_ALL_REFERENCES,
+    GET_RAW_MESSAGE
 }

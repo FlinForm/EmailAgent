@@ -86,6 +86,11 @@ public class GmailApiRequests implements ApiRequests {
         batchRequest.execute();
     }
 
+    @Override
+    public Message getRawMesage(Gmail service, String userId, Message message) throws IOException {
+        return service.users().messages().get(userId, message.getId()).setFormat("raw").execute();
+    }
+
     //Finished
     @Override
     public void deleteMessage(Gmail service, String userId, String messageId) throws IOException {
