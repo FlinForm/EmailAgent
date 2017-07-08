@@ -49,11 +49,9 @@ public class LetterActivity extends AppCompatActivity {
         webView.setInitialScale(getScale());
         webView.setWebChromeClient(new WebChromeClient());
         webView.loadData(getMessageBody(Mailbox.getMessage()),
-                "text/html",
-                "UTF-8");
-
-
-
+                "text/html; charset=utf-8",
+                null);
+        
         fillCard(Mailbox.getMessage());
     }
 
@@ -81,7 +79,6 @@ public class LetterActivity extends AppCompatActivity {
                     .getPayload()
                     .getBody()
                     .getData());
-            System.out.println(1);
         } else {
             bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
                     .getPayload()
@@ -89,7 +86,6 @@ public class LetterActivity extends AppCompatActivity {
                     .get(1)
                     .getBody()
                     .getData());
-            System.out.println(2);
         }
         String body = "";
 
