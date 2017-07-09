@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
+import com.epam.androidlab.emailagent.api.GmailApiRequests;
+import com.epam.androidlab.emailagent.api.RequestHandler;
+import com.epam.androidlab.emailagent.api.RequestType;
 import com.google.api.services.gmail.model.Message;
 
 import java.util.List;

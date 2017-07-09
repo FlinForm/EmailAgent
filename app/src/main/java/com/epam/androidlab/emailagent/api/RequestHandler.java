@@ -16,12 +16,12 @@ import javax.mail.internet.MimeMessage;
 
 public class RequestHandler extends AsyncTask<Object, Void, Void> {
     private final String INBOX_QUERY = "INBOX";
-
     private final String myId;
     private final MimeMessage mimeMessage;
     private final String messageId;
+
     private com.google.api.services.gmail.Gmail service;
-    public OnDataChangedListener listener;
+    public OnDataChangedListener onDataChangedListener;
     private ApiRequests apiRequests;
     private List<Message> messages;
     private List<String> query;
@@ -31,8 +31,8 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                           List<Message> messages,
                           MimeMessage mimeMessage,
                           String messageId,
-                          OnDataChangedListener listener) {
-        this.listener = listener;
+                          OnDataChangedListener onDataChangedListener) {
+        this.onDataChangedListener = onDataChangedListener;
         this.apiRequests = apiRequests;
         this.messages = messages;
         this.mimeMessage = mimeMessage;
@@ -46,8 +46,8 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         if (mimeMessage == null) {
-            if (listener != null) {
-                listener.onDataChanged();
+            if (onDataChangedListener != null) {
+                onDataChangedListener.onDataChanged();
             }
         }
     }
@@ -88,11 +88,12 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     return;
                 }
                 apiRequests.batchRequest(service, myId, messages, params[1].toString());
-                for (Message message : messages) {
+                messages.add(null);
+                /*for (Message message : messages) {
                     if (message != null) {
                         System.out.println(message.getPayload().getMimeType());
                     }
-                }
+                }*/
                 break;
             case DELETE_MESSAGE:
                 if (messageId != null) {
@@ -116,6 +117,10 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     }
                     Mailbox.getUnRead().remove(message);
                 }
+                break;
+            case GET_RAW_MESSAGE:
+                Mailbox.setRawMessage(apiRequests.getRawMessage(service, myId, Mailbox.getMessage().getId()));
+                break;
         }
     }
 

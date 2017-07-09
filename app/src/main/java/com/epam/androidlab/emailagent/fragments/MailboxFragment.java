@@ -14,10 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.epam.androidlab.emailagent.R;
-import com.epam.androidlab.emailagent.activities.MainActivity;
 import com.epam.androidlab.emailagent.activities.NewEmailActivity;
 import com.epam.androidlab.emailagent.api.GmailApiHelper;
 import com.epam.androidlab.emailagent.api.GmailApiRequests;
@@ -111,10 +109,8 @@ public class MailboxFragment extends Fragment
         if (progressBar.getVisibility() == View.VISIBLE) {
             progressBar.setVisibility(View.INVISIBLE);
         }
-        if (messages.size() > 10) {
-            messages.remove(messages.size() - 11);
-        }
-        messages.add(null);
+        messages.remove(null);
+
 
         recyclerView.getAdapter().notifyDataSetChanged();
 

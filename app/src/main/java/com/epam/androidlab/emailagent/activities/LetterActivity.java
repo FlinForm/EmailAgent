@@ -10,9 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 import android.widget.TextView;
@@ -32,15 +30,24 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class LetterActivity extends AppCompatActivity {
-    WebView webView;
+    private final String MULTIPART_ALTERNATIVE = "multipart/alternative";
+    private final String TEXT_HTML = "text/html";
+    private final String TEXT_PLAIN = "text/plain";
+    private final String MULTIPART_MIXED = "multipart/mixed";
+    private final String TEXT_CALENDAR = "text/calendar";
+    private final String MULTIPART_SIGNED = "multipart/signed";
+    private final String MULTIPART_RELATED = "multipart/related";
+    private WebView webView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.material_letter);
 
+        System.out.println(Mailbox.getMessage().getPayload().getMimeType());
+
         new RequestHandler(new GmailApiRequests(), null, null, null, null)
-                .execute(RequestType.MODIFY_MESSAGE);
+                .execute(RequestType.GET_RAW_MESSAGE);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
@@ -78,22 +85,60 @@ public class LetterActivity extends AppCompatActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    private String getMessageBody(Message message) {
-        byte[] bodyBytes;
-        if (message.getPayload().getParts() == null) {
-            bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
-                    .getPayload()
-                    .getBody()
-                    .getData());
-        } else {
-            bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
-                    .getPayload()
-                    .getParts()
-                    .get(1)
-                    .getBody()
-                    .getData());
+    private String getMessageBody(Message message) {byte[] bodyBytes;
+        switch (message.getPayload().getMimeType()) {
+            case MULTIPART_ALTERNATIVE:
+                bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
+                        .getPayload()
+                        .getParts()
+                        .get(1)
+                        .getBody()
+                        .getData());
+                break;
+            case TEXT_HTML:
+                bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
+                        .getPayload()
+                        .getBody()
+                        .getData());
+                break;
+            case TEXT_PLAIN:
+                bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
+                        .getPayload()
+                        .getBody()
+                        .getData());
+                break;
+            case MULTIPART_MIXED:
+                bodyBytes = null;
+                break;
+            case TEXT_CALENDAR:
+                bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
+                        .getPayload()
+                        .getParts()
+                        .get(0)
+                        .getParts()
+                        .get(1)
+                        .getBody()
+                        .getData());
+                break;
+            case MULTIPART_SIGNED:
+                bodyBytes = Base64.decodeBase64(Mailbox.getMessage()
+                        .getPayload()
+                        .getParts()
+                        .get(0)
+                        .getParts()
+                        .get(1)
+                        .getBody()
+                        .getData());
+                break;
+            case MULTIPART_RELATED:
+                bodyBytes = null;
+                break;
+            default:
+                bodyBytes = null;
+                break;
         }
         String body = "";
+        System.out.println(bodyBytes == null);
         try {
             if (bodyBytes != null) {
                 body = new String(bodyBytes, "UTF-8");
@@ -101,6 +146,7 @@ public class LetterActivity extends AppCompatActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        System.out.println(body);
         return body;
     }
 

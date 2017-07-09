@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,9 +21,6 @@ import com.epam.androidlab.emailagent.api.RequestHandler;
 import com.epam.androidlab.emailagent.api.RequestType;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import javax.mail.internet.MimeMessage;
 

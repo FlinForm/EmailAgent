@@ -96,6 +96,12 @@ public class GmailApiRequests implements ApiRequests {
 
     //Finished
     @Override
+    public Message getRawMessage(Gmail service, String userId, String messageId) throws IOException {
+        return service.users().messages().get(userId, messageId).setFormat("raw").execute();
+    }
+
+    //Finished
+    @Override
     public void trashMessage(Gmail service, String userId, String messageId) throws IOException {
         service.users().messages().trash(userId, messageId).execute();
     }
