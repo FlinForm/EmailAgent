@@ -6,5 +6,6 @@ public enum RequestType {
     SEND_EMAIL,
     DELETE_MESSAGE,
     GET_ALL_REFERENCES,
+    MODIFY_MESSAGE,
     GET_RAW_MESSAGE
 }

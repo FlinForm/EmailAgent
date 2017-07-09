@@ -46,7 +46,9 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         if (mimeMessage == null) {
-            listener.onDataChanged();
+            if (listener != null) {
+                listener.onDataChanged();
+            }
         }
     }
 
@@ -100,7 +102,20 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     }
                 }
                 break;
-
+            case MODIFY_MESSAGE:
+                Message message = Mailbox.getMessage();
+                if (message.getLabelIds().contains(MailboxIdentifiers.UNREAD.toString())) {
+                    apiRequests.modifyMessage(service, message.getId(), myId);
+                    System.out.println(Mailbox.getUnRead().size());
+                    for (Message m : Mailbox.getUnRead()) {
+                        if (m.getId().equals(message.getId())) {
+                            message = m;
+                            break;
+                        }
+                    }
+                    Mailbox.getUnRead().remove(message);
+                    System.out.println(Mailbox.getUnRead().size());
+                }
         }
     }
 

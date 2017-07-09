@@ -11,6 +11,8 @@ import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
 import com.epam.androidlab.emailagent.services.MessageReceiver;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.services.gmail.Gmail;
+import com.google.api.services.gmail.model.WatchRequest;
 
 import android.Manifest;
 import android.accounts.AccountManager;
@@ -37,6 +39,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -94,6 +98,18 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+
+        WatchRequest request = new WatchRequest();
+        List<String> labels = new ArrayList<>();
+        labels.add("INBOX");
+        request.setLabelIds(labels);
+        request.setTopicName("projects/virtual-plexus-169911/topics/mytopic");
+        try {
+            Gmail.Users.Watch w = GmailApiHelper.gmailService.users().watch("me", request);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

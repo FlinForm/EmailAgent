@@ -17,8 +17,11 @@ public interface ApiRequests {
 
     void trashMessage(Gmail service, String userId, String messageId) throws IOException;
 
+
     void deleteMessage(Gmail service, String userId, String messageId) throws IOException;
 
     Message sendEmail(Gmail service, String userId, MimeMessage email)
             throws MessagingException, IOException;
+
+    void modifyMessage(Gmail service, String messageId, String userId) throws IOException;
 }

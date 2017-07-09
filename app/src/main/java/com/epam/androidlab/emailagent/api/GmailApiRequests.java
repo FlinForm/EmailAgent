@@ -10,9 +10,12 @@ import com.google.api.client.util.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.ListMessagesResponse;
 import com.google.api.services.gmail.model.Message;
+import com.google.api.services.gmail.model.ModifyMessageRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.mail.MessagingException;
@@ -46,6 +49,7 @@ public class GmailApiRequests implements ApiRequests {
         }
     }
 
+    //Finished
     @Override
     public void batchRequest(Gmail service, String userId, List<Message> messages, String query)
     throws IOException {
@@ -105,6 +109,13 @@ public class GmailApiRequests implements ApiRequests {
         message = service.users().messages().send(userId, message).execute();
         Mailbox.getOutboxMessages().add(message);
         return message;
+    }
+
+    @Override
+    public void modifyMessage(Gmail service, String messageId, String userId) throws IOException {
+        ModifyMessageRequest messageRequest = new ModifyMessageRequest();
+        messageRequest.setRemoveLabelIds(Arrays.asList("UNREAD"));
+        service.users().messages().modify(userId, messageId, messageRequest).execute();
     }
 
     public static Message makeMessageFromMimeMessage(MimeMessage email)

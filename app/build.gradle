@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.epam.androidlab.emailagent"
         minSdkVersion 23
-        targetSdkVersion 26
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -36,6 +36,7 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+
     compile 'uk.co.chrisjenx:calligraphy:2.3.0'
     compile 'com.google.android.gms:play-services-auth:11.0.2'
     compile 'com.sun.mail:android-activation:1.5.5'

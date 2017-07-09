@@ -18,6 +18,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.epam.androidlab.emailagent.R;
+import com.epam.androidlab.emailagent.api.GmailApiRequests;
+import com.epam.androidlab.emailagent.api.RequestHandler;
+import com.epam.androidlab.emailagent.api.RequestType;
 import com.epam.androidlab.emailagent.model.AdapterUtils;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.google.api.client.util.Base64;
@@ -35,6 +38,9 @@ public class LetterActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.material_letter);
+
+        new RequestHandler(new GmailApiRequests(), null, null, null, null)
+                .execute(RequestType.MODIFY_MESSAGE);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/Marmelad-Regular.ttf")

@@ -102,6 +102,7 @@ public class MailboxRecycleViewAdapter
         @Override
         public void onClick(View v) {
             Mailbox.setMessage(message);
+
             listener.onLetterSelected();
         }
     }
