@@ -89,7 +89,9 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                 }
                 apiRequests.batchRequest(service, myId, messages, params[1].toString());
                 for (Message message : messages) {
-                    System.out.println(message.getPayload().getMimeType());
+                    if (message != null) {
+                        System.out.println(message.getPayload().getMimeType());
+                    }
                 }
                 break;
             case DELETE_MESSAGE:
@@ -106,7 +108,6 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                 Message message = Mailbox.getMessage();
                 if (message.getLabelIds().contains(MailboxIdentifiers.UNREAD.toString())) {
                     apiRequests.modifyMessage(service, message.getId(), myId);
-                    System.out.println(Mailbox.getUnRead().size());
                     for (Message m : Mailbox.getUnRead()) {
                         if (m.getId().equals(message.getId())) {
                             message = m;
@@ -114,7 +115,6 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                         }
                     }
                     Mailbox.getUnRead().remove(message);
-                    System.out.println(Mailbox.getUnRead().size());
                 }
         }
     }

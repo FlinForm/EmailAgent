@@ -69,9 +69,7 @@ public class MailboxFragment extends Fragment
                         mailboxIdentifier.toString().toLowerCase());
 
         progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
-
         messages = new ArrayList<>();
-
         linearLayoutManager = new LinearLayoutManager(getContext());
 
         MailboxRecycleViewAdapter adapter = new MailboxRecycleViewAdapter(getActivity(), messages);
@@ -110,8 +108,16 @@ public class MailboxFragment extends Fragment
 
     @Override
     public void onDataChanged() {
-        progressBar.setVisibility(View.INVISIBLE);
+        if (progressBar.getVisibility() == View.VISIBLE) {
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+        if (messages.size() > 10) {
+            messages.remove(messages.size() - 11);
+        }
+        messages.add(null);
+
         recyclerView.getAdapter().notifyDataSetChanged();
+
     }
 
     @Override
@@ -144,11 +150,9 @@ public class MailboxFragment extends Fragment
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         List<Message> messageReferences = getMailboxByIdentifier();
-
-         if (messages.size() < messageReferences.size()) {
+         if (messages.size() - 1 < messageReferences.size()) {
             if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == messages.size() - 1) {
                 if (GmailApiHelper.isDeviceOnline(getContext())) {
-                    progressBar.setVisibility(View.VISIBLE);
                     new RequestHandler(new GmailApiRequests(),
                             messages,
                             null,

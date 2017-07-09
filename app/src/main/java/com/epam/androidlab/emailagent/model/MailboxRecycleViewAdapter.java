@@ -18,6 +18,8 @@ public class MailboxRecycleViewAdapter
         extends RecyclerView.Adapter<MailboxRecycleViewAdapter.ItemViewHolder> {
     private final List<Message> messages;
     private final String EXCEPTION_TEXT = " must implement OnMailSelectedListener";
+    private final int ITEM = 0;
+    private final int PROGRESS = 1;
 
     private AdapterUtils helper;
     private View view;
@@ -35,32 +37,46 @@ public class MailboxRecycleViewAdapter
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        view = LayoutInflater.from(parent
-                .getContext())
-                .inflate(R.layout.material_card, parent, false);
-        helper = new AdapterUtils(view.getContext());
+        if (viewType == PROGRESS) {
+            view = LayoutInflater.from(parent
+                    .getContext())
+                    .inflate(R.layout.item_loading, parent, false);
+            helper = new AdapterUtils(view.getContext());
+        } else {
+            view = LayoutInflater.from(parent
+                    .getContext())
+                    .inflate(R.layout.material_card, parent, false);
+            helper = new AdapterUtils(view.getContext());
+        }
         return new ItemViewHolder(view);
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return messages.get(position) == null ? PROGRESS : ITEM;
+    }
+
+    @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-        Message message = messages.get(position);
-        holder.MENU_ITEM_ID = position;
-        holder.mailerOrReceiver
-                .setText(helper.formatReceiverText(helper.getReceiver(message)));
-        holder.subject
-                .setText(helper.getMessageSubject(message));
-        holder.message = message;
-        if ("".equals(message.getSnippet())) {
-            holder.body.setText(R.string.no_content);
-        } else {
-            holder.body.setText(helper.formatCardText(message.getSnippet()));
+        if (messages.get(position) != null) {
+            Message message = messages.get(position);
+            holder.MENU_ITEM_ID = position;
+            holder.mailerOrReceiver
+                    .setText(helper.formatReceiverText(helper.getReceiver(message)));
+            holder.subject
+                    .setText(helper.getMessageSubject(message));
+            holder.message = message;
+            if ("".equals(message.getSnippet())) {
+                holder.body.setText(R.string.no_content);
+            } else {
+                holder.body.setText(helper.formatCardText(message.getSnippet()));
+            }
+            holder.date.setText(helper.parseDate(helper.getDate(message)));
+            helper.setImageViewColor(helper.getReceiver(message).substring(0, 1).toLowerCase(),
+                    holder.imageView);
+            helper.setImageViewText(helper.getReceiver(message).substring(0, 2),
+                    holder.imageViewText);
         }
-        holder.date.setText(helper.parseDate(helper.getDate(message)));
-        helper.setImageViewColor(helper.getReceiver(message).substring(0, 1).toLowerCase(),
-                holder.imageView);
-        helper.setImageViewText(helper.getReceiver(message).substring(0, 2),
-                holder.imageViewText);
     }
 
     @Override
@@ -102,7 +118,6 @@ public class MailboxRecycleViewAdapter
         @Override
         public void onClick(View v) {
             Mailbox.setMessage(message);
-
             listener.onLetterSelected();
         }
     }
