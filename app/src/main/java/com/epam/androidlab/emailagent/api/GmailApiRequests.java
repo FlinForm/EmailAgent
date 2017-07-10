@@ -14,7 +14,6 @@ import com.google.api.services.gmail.model.ModifyMessageRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -65,7 +64,6 @@ public class GmailApiRequests implements ApiRequests {
         JsonBatchCallback<Message> callback = new JsonBatchCallback<Message>() {
             @Override
             public void onFailure(GoogleJsonError e, HttpHeaders responseHeaders) throws IOException {
-
             }
 
             @Override

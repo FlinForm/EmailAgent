@@ -43,7 +43,7 @@ public class MailboxFragment extends Fragment
     private List<Message> messages;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private ProgressBar progressBar;
+    private ProgressBar progressBar, recyclerProgressBar;
 
     @Nullable
     @Override
@@ -67,6 +67,8 @@ public class MailboxFragment extends Fragment
                         mailboxIdentifier.toString().toLowerCase());
 
         progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
+        recyclerProgressBar = (ProgressBar) view.findViewById(R.id.progressBarRecycle);
+
         messages = new ArrayList<>();
         linearLayoutManager = new LinearLayoutManager(getContext());
 
@@ -109,11 +111,12 @@ public class MailboxFragment extends Fragment
         if (progressBar.getVisibility() == View.VISIBLE) {
             progressBar.setVisibility(View.INVISIBLE);
         }
-        messages.remove(null);
-
+        while (messages.contains(null)){
+            messages.remove(null);
+        }
+        messages.add(null);
 
         recyclerView.getAdapter().notifyDataSetChanged();
-
     }
 
     @Override
@@ -121,14 +124,12 @@ public class MailboxFragment extends Fragment
         String messageId = messages.get(item.getItemId()).getId();
         if (GmailApiHelper.isDeviceOnline(getContext())) {
             if (mailboxIdentifier.equals(MailboxIdentifiers.TRASH)) {
-                progressBar.setVisibility(View.VISIBLE);
                 new RequestHandler(new GmailApiRequests(),
                         messages,
                         null,
                         messageId,
                         this).execute(RequestType.DELETE_MESSAGE, null);
             } else {
-                progressBar.setVisibility(View.VISIBLE);
                 new RequestHandler(new GmailApiRequests(),
                         messages,
                         null,
@@ -142,11 +143,14 @@ public class MailboxFragment extends Fragment
         return true;
     }
 
-    // !!!!!! FIX SCREEN ROTATION BUG !!!!!!!!!
+
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         List<Message> messageReferences = getMailboxByIdentifier();
-         if (messages.size() - 1 < messageReferences.size()) {
+        if (messages.size() == messageReferences.size()) {
+
+        }
+         if (messages.size() < messageReferences.size()) {
             if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == messages.size() - 1) {
                 if (GmailApiHelper.isDeviceOnline(getContext())) {
                     new RequestHandler(new GmailApiRequests(),

@@ -88,7 +88,6 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     return;
                 }
                 apiRequests.batchRequest(service, myId, messages, params[1].toString());
-                messages.add(null);
                 /*for (Message message : messages) {
                     if (message != null) {
                         System.out.println(message.getPayload().getMimeType());

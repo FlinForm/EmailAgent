@@ -29,7 +29,7 @@ import java.io.UnsupportedEncodingException;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class LetterActivity extends AppCompatActivity {
+public class LetterContentActivity extends AppCompatActivity {
     private final String MULTIPART_ALTERNATIVE = "multipart/alternative";
     private final String TEXT_HTML = "text/html";
     private final String TEXT_PLAIN = "text/plain";
@@ -44,10 +44,8 @@ public class LetterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.material_letter);
 
-        System.out.println(Mailbox.getMessage().getPayload().getMimeType());
-
         new RequestHandler(new GmailApiRequests(), null, null, null, null)
-                .execute(RequestType.GET_RAW_MESSAGE);
+                .execute(RequestType.MODIFY_MESSAGE);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                 .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
@@ -85,7 +83,8 @@ public class LetterActivity extends AppCompatActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    private String getMessageBody(Message message) {byte[] bodyBytes;
+    private String getMessageBody(Message message) {
+        byte[] bodyBytes;
         switch (message.getPayload().getMimeType()) {
             case MULTIPART_ALTERNATIVE:
                 bodyBytes = Base64.decodeBase64(Mailbox.getMessage()

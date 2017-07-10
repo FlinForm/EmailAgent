@@ -19,6 +19,7 @@ import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -53,13 +54,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView.OnNavigationItemSelectedListener,
         MailboxRecycleViewAdapter.OnMailSelectedListener,
         RequestHandler.OnDataChangedListener {
-
-    private final String MAILBOX_IDENTIFIER_TAG = "identifier";
-
     private static final int REQUEST_ACCOUNT_PICKER = 1000;
     private static final int REQUEST_AUTHORIZATION = 1001;
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
+
+    private final String MAILBOX_IDENTIFIER_TAG = "identifier";
+
+    private String MENU_TITLE;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
 
@@ -82,9 +84,9 @@ public class MainActivity extends AppCompatActivity
         progressBar = (ProgressBar) findViewById(R.id.activityProgressBar);
         progressBar.setVisibility(View.INVISIBLE);
 
+        MENU_TITLE = getString(R.string.inbox_messages);
         toolBar = (Toolbar) findViewById(R.id.toolbar);
         toolBar.setTitle("");
-        toolBar.inflateMenu(R.menu.new_email_tmenu);
         setSupportActionBar(toolBar);
 
         if (!Mailbox.isLinksReceived()) {
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
             case R.id.inbox_messages:
+                MENU_TITLE = getString(R.string.inbox_messages);
                 Fragment inboxFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.INBOX.toString());
                 inboxFragment.setArguments(bundle);
@@ -154,6 +157,7 @@ public class MainActivity extends AppCompatActivity
                         MailboxIdentifiers.INBOX.toString());
                 break;
             case R.id.outbox_messages:
+                MENU_TITLE = getString(R.string.outbox_messages);
                 Fragment outboxFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.SENT.toString());
                 outboxFragment.setArguments(bundle);
@@ -162,6 +166,7 @@ public class MainActivity extends AppCompatActivity
                         MailboxIdentifiers.SENT.toString());
                 break;
             case R.id.drafts:
+                MENU_TITLE = getString(R.string.drafts);
                 Fragment draftsFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.DRAFT.toString());
                 draftsFragment.setArguments(bundle);
@@ -170,6 +175,7 @@ public class MainActivity extends AppCompatActivity
                         MailboxIdentifiers.DRAFT.toString());
                 break;
             case R.id.recycle:
+                MENU_TITLE = getString(R.string.recycle);
                 Fragment recycleFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.TRASH.toString());
                 recycleFragment.setArguments(bundle);
@@ -178,6 +184,9 @@ public class MainActivity extends AppCompatActivity
                         MailboxIdentifiers.TRASH.toString());
                 break;
             case R.id.unread_messages:
+                MENU_TITLE = getString(R.string.unread_messages);
+                item.setTitle(getString(R.string.unread_messages));
+                invalidateOptionsMenu();
                 Fragment unreadFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.UNREAD.toString());
                 unreadFragment.setArguments(bundle);
@@ -186,14 +195,22 @@ public class MainActivity extends AppCompatActivity
                         MailboxIdentifiers.TRASH.toString());
                 break;
         }
+        invalidateOptionsMenu();
         drawerLayout.closeDrawer(Gravity.START);
         transaction.commit();
         return true;
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        MenuItem item = menu.findItem(R.id.toolbarTitle);
+        item.setTitle(MENU_TITLE);
         return true;
     }
 
@@ -216,7 +233,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLetterSelected() {
-        Intent intent = new Intent(this, LetterActivity.class);
+        Intent intent = new Intent(this, LetterContentActivity.class);
         startActivity(intent);
     }
 
