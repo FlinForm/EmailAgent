@@ -20,9 +20,13 @@ import java.util.List;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+/**
+ * Its and implementation of ApiRequests, using gmail API.
+ */
+
 public class GmailApiRequests implements ApiRequests {
 
-    //Finished
+    //This method receives message references when first time connected to mailbox.
     @Override
     public void getMessageReferences(Gmail service, String userId, List<String> queries)
             throws IOException {
@@ -48,7 +52,7 @@ public class GmailApiRequests implements ApiRequests {
         }
     }
 
-    //Finished
+    //Forms batch request to get 10 messages from mailbox with given references.
     @Override
     public void batchRequest(Gmail service, String userId, List<Message> messages, String query)
     throws IOException {
@@ -86,26 +90,26 @@ public class GmailApiRequests implements ApiRequests {
         batchRequest.execute();
     }
 
-    //Finished
+    //Deletes message from the mailbox.
     @Override
     public void deleteMessage(Gmail service, String userId, String messageId) throws IOException {
         service.users().threads().delete(userId, messageId).execute();
     }
 
-    //Finished
+    //Gets Raw content of the message.
     @Override
     public Message getRawMessage(Gmail service, String userId, String messageId) throws IOException {
         return service.users().messages().get(userId, messageId).setFormat("raw").execute();
     }
 
-    //Finished
+    //Moves selected message to mailbox trash.
     @Override
     public void trashMessage(Gmail service, String userId, String messageId) throws IOException {
         service.users().messages().trash(userId, messageId).execute();
     }
 
 
-    //Finished
+    //Sends new message.
     @Override
     public Message sendEmail(Gmail service, String userId, MimeMessage email)
             throws MessagingException, IOException {
@@ -115,6 +119,7 @@ public class GmailApiRequests implements ApiRequests {
         return message;
     }
 
+    //This method removes "UNREAD" label from message, when user opens message first time.
     @Override
     public void modifyMessage(Gmail service, String messageId, String userId) throws IOException {
         ModifyMessageRequest messageRequest = new ModifyMessageRequest();
@@ -122,6 +127,7 @@ public class GmailApiRequests implements ApiRequests {
         service.users().messages().modify(userId, messageId, messageRequest).execute();
     }
 
+    //Constructs Message from MimeMessage
     public static Message makeMessageFromMimeMessage(MimeMessage email)
             throws IOException, MessagingException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -133,8 +139,9 @@ public class GmailApiRequests implements ApiRequests {
         return message;
     }
 
-    private List<Message> getListByQuery(String query) {
-        switch (MailboxIdentifiers.valueOf(query)) {
+    //Gets list of messages by given tag.
+    private List<Message> getListByQuery(String tag) {
+        switch (MailboxIdentifiers.valueOf(tag)) {
             case INBOX:
                 return Mailbox.getInboxMessages();
             case SENT:

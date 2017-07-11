@@ -29,6 +29,11 @@ import java.io.UnsupportedEncodingException;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+/**
+ * Its an activity with letter content.
+ * Application calls it when we want to view content of selected email letter.
+ */
+
 public class LetterContentActivity extends AppCompatActivity {
     private final String MULTIPART_ALTERNATIVE = "multipart/alternative";
     private final String TEXT_HTML = "text/html";
@@ -59,7 +64,7 @@ public class LetterContentActivity extends AppCompatActivity {
         webView = (WebView) findViewById(R.id.materialWebView);
         webView.setInitialScale(getScale());
         webView.setWebChromeClient(new WebChromeClient());
-        webView.loadData(getMessageBody(Mailbox.getMessage()),
+        webView.loadData(setMessageBody(Mailbox.getMessage()),
                 "text/html; charset=utf-8",
                 null);
 
@@ -83,7 +88,9 @@ public class LetterContentActivity extends AppCompatActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    private String getMessageBody(Message message) {
+    // This method handles body part of MimeMessage, received from gmail API,
+    // and returns it is string view.
+    private String setMessageBody(Message message) {
         byte[] bodyBytes;
         switch (message.getPayload().getMimeType()) {
             case MULTIPART_ALTERNATIVE:
@@ -149,6 +156,7 @@ public class LetterContentActivity extends AppCompatActivity {
         return body;
     }
 
+    // Fills card in the top of the activity with content.
     private void fillCard(Message message) {
         AdapterUtils helper = new AdapterUtils(this);
         TextView mailer = (TextView) findViewById(R.id.mailer);
@@ -172,6 +180,7 @@ public class LetterContentActivity extends AppCompatActivity {
                 imageViewText);
     }
 
+    // Calculates screen width of android device.
     private int getScale(){
         Display display =
                 ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();

@@ -17,11 +17,9 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePartHeader;
-import com.google.api.services.gmail.model.WatchRequest;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -34,6 +32,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+/**
+ * This class provides methods to initialize gmail API in application.
+ */
 
 public class GmailApiHelper {
     public static com.google.api.services.gmail.Gmail gmailService;
@@ -48,12 +50,14 @@ public class GmailApiHelper {
 
     private static final String APPLICATION_NAME = "Email Agent";
 
+    //Initializes users credential.
     public static void initCredential(Context context) {
         GmailApiHelper.credential = GoogleAccountCredential.usingOAuth2(
                 context, Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
     }
 
+    // Initializes gmail API service.
     public static void initGmailService() {
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
@@ -63,10 +67,7 @@ public class GmailApiHelper {
                 .build();
     }
 
-    private void getResultsFromApi() {
-
-    }
-
+    //Checks is android device is online.
     public static boolean isDeviceOnline(Context context) {
         ConnectivityManager connMgr =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -74,6 +75,7 @@ public class GmailApiHelper {
         return (networkInfo != null && networkInfo.isConnected());
     }
 
+    // Checks if google play services are available on device.
     public static boolean isGooglePlayServicesAvailable(Context context) {
         GoogleApiAvailability apiAvailability =
                 GoogleApiAvailability.getInstance();
@@ -82,7 +84,7 @@ public class GmailApiHelper {
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
-    //Finished
+    //Creates MimeMessage with given parts.
     public static MimeMessage createNewEmailMessage(String to,
                                                     String subject,
                                                     String messageText,
@@ -120,6 +122,7 @@ public class GmailApiHelper {
         return null;
     }
 
+    //Gets message part.
     public static String getMessagePart(String part, Message message) {
         if (message == null) {
             message = Mailbox.getMessage();

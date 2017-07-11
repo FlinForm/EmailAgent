@@ -20,6 +20,8 @@
             android:authorities="com.epam.androidlab.emailagent.services"
             android:exported="false" />
 
+        <service android:name=".services.MessagingService"/>
+
         <receiver android:name=".services.MessageReceiver"/>
 
         <activity android:name=".activities.MainActivity">

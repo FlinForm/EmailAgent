@@ -2,7 +2,6 @@ package com.epam.androidlab.emailagent.model;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +15,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+/**
+ * This class contains methods which are used to format text in RecyclerView cards.
+ */
 
 public class AdapterUtils {
     private final String SUBJECT_TAG = "Subject";

@@ -1,7 +1,6 @@
 package com.epam.androidlab.emailagent.api;
 
 import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Draft;
 import com.google.api.services.gmail.model.Message;
 
 import java.io.IOException;
@@ -9,6 +8,10 @@ import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+/**
+ * This abstract interface describes basic calls directed to API.
+ */
 
 public interface ApiRequests {
     void getMessageReferences(Gmail service, String userId, List<String> queries) throws IOException;

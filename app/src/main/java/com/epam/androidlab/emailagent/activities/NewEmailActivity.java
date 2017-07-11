@@ -27,6 +27,12 @@ import javax.mail.internet.MimeMessage;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+/**
+ * This activity provides content to create new letter.
+ * Here we need to fill 3 fields to send letter: email body, receiver and letter subject.
+ * Also user can attach a file to his letter.
+ */
+
 public class NewEmailActivity extends AppCompatActivity {
     private final int REQUEST_CODE = 13;
 
@@ -89,6 +95,7 @@ public class NewEmailActivity extends AppCompatActivity {
         return  true;
     }
 
+    //This method attaches file to email.
     private void attachFile(Intent data) {
         file = new File(data.getData().getEncodedPath());
         ImageView view = new ImageView(this);
@@ -102,6 +109,7 @@ public class NewEmailActivity extends AppCompatActivity {
         layout.addView(view);
     }
 
+    //Forms new email message and sends it.
     private void sendNewEmail() {
         if ("".equals(receiver.getText().toString())) {
             Snackbar.make(getCurrentFocus(),

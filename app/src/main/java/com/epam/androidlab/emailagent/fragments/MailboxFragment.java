@@ -31,6 +31,7 @@ import java.util.List;
 
 public class MailboxFragment extends Fragment
         implements View.OnScrollChangeListener, RequestHandler.OnDataChangedListener {
+    private final String PROVIDER_URI = "content://com.epam.androidlab.emailagent.provider/";
     private final String MESSAGE_ID = "messageId";
     private final String MESSAGE_SNIPPET = "snippet";
     private final String SENDER = "sender";
@@ -44,6 +45,12 @@ public class MailboxFragment extends Fragment
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private ProgressBar progressBar, recyclerProgressBar;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     @Nullable
     @Override
@@ -62,9 +69,7 @@ public class MailboxFragment extends Fragment
                     MailboxIdentifiers.valueOf(bundle.getString(MAILBOX_IDENTIFIER_TAG));
         }
 
-        MAILBOX_URI =
-                Uri.parse("content://com.epam.androidlab.emailagent.provider/" +
-                        mailboxIdentifier.toString().toLowerCase());
+        MAILBOX_URI = Uri.parse(PROVIDER_URI + mailboxIdentifier.toString().toLowerCase());
 
         progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
         recyclerProgressBar = (ProgressBar) view.findViewById(R.id.progressBarRecycle);
@@ -103,7 +108,6 @@ public class MailboxFragment extends Fragment
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //saveDataToDatabase();
     }
 
     @Override
@@ -143,12 +147,12 @@ public class MailboxFragment extends Fragment
         return true;
     }
 
-
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         List<Message> messageReferences = getMailboxByIdentifier();
         if (messages.size() == messageReferences.size()) {
-
+            /*messages.remove(messages.size() - 1);
+            recyclerView.getAdapter().notifyItemRemoved(messages.size() - 1);*/
         }
          if (messages.size() < messageReferences.size()) {
             if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == messages.size() - 1) {
@@ -179,6 +183,7 @@ public class MailboxFragment extends Fragment
         return null;
     }
 
+    // Not finished yet.
     private void saveDataToDatabase() {
         for (int i = 0; i < messages.size(); i++) {
             ContentValues cv = new ContentValues();

@@ -6,13 +6,16 @@ import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.google.api.services.gmail.model.Message;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+/**
+ * Handles requests addressed to gmail API in parallel thread.
+ */
 
 public class RequestHandler extends AsyncTask<Object, Void, Void> {
     private final String INBOX_QUERY = "INBOX";
@@ -88,11 +91,6 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     return;
                 }
                 apiRequests.batchRequest(service, myId, messages, params[1].toString());
-                /*for (Message message : messages) {
-                    if (message != null) {
-                        System.out.println(message.getPayload().getMimeType());
-                    }
-                }*/
                 break;
             case DELETE_MESSAGE:
                 if (messageId != null) {
@@ -118,11 +116,13 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                 }
                 break;
             case GET_RAW_MESSAGE:
-                Mailbox.setRawMessage(apiRequests.getRawMessage(service, myId, Mailbox.getMessage().getId()));
+                Mailbox.setRawMessage(apiRequests
+                        .getRawMessage(service, myId, Mailbox.getMessage().getId()));
                 break;
         }
     }
 
+    //Gets messages of all mailboxes with getMessageReferences() method.
     private void getAllReferences() throws IOException {
         query.add(MailboxIdentifiers.INBOX.toString());
         apiRequests.getMessageReferences(service, myId, query);
@@ -141,6 +141,7 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
         query.clear();
     }
 
+    // Updates gmail trash when user deletes message.
     private void updateTrash() throws IOException {
         Mailbox.getTrash().clear();
         query.add(MailboxIdentifiers.TRASH.toString());

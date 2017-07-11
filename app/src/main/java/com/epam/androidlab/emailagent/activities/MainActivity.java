@@ -10,6 +10,7 @@ import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
 import com.epam.androidlab.emailagent.services.MessageReceiver;
+import com.epam.androidlab.emailagent.services.MessagingService;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.WatchRequest;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
-        //startEmailService();
+        startService(new Intent(this, MessagingService.class));
 
         progressBar = (ProgressBar) findViewById(R.id.activityProgressBar);
         progressBar.setVisibility(View.INVISIBLE);
@@ -356,12 +357,13 @@ public class MainActivity extends AppCompatActivity
     private void startEmailService() {
         AlarmManager alarmManager;
         PendingIntent pendingIntent;
-        alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, MessageReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this, 0,
                 intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + 5000,
-                5000, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(),
+                5000,
+                pendingIntent);
     }
 }
