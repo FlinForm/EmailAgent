@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Mailbox {
-    private static List<Message> inboxMessages = new ArrayList<>();
-    private static List<Message> outboxMessages = new ArrayList<>();
-    private static List<Message> drafts = new ArrayList<>();
-    private static List<Message> trash = new ArrayList<>();
-    private static List<Message> unRead = new ArrayList<>();
+    private static final List<Message> inboxMessages = new ArrayList<>();
+    private static final List<Message> outboxMessages = new ArrayList<>();
+    private static final List<Message> drafts = new ArrayList<>();
+    private static final List<Message> trash = new ArrayList<>();
+    private static final List<Message> unRead = new ArrayList<>();
     private static Message message;
     private static Message rawMessage;
     private static boolean linksReceived;
@@ -52,10 +52,6 @@ public class Mailbox {
 
     public static void setLinksReceived(boolean linksReceived) {
         Mailbox.linksReceived = linksReceived;
-    }
-
-    public static Message getRawMessage() {
-        return rawMessage;
     }
 
     public static void setRawMessage(Message rawMessage) {

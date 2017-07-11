@@ -13,7 +13,7 @@ import javax.mail.internet.MimeMessage;
  * This abstract interface describes basic calls directed to API.
  */
 
-public interface ApiRequests {
+interface ApiRequests {
     void getMessageReferences(Gmail service, String userId, List<String> queries) throws IOException;
 
     void batchRequest(Gmail service, String userId, List<Message> messages, String query) throws IOException;

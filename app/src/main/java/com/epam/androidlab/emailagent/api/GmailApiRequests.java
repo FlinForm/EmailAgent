@@ -14,7 +14,7 @@ import com.google.api.services.gmail.model.ModifyMessageRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.mail.MessagingException;
@@ -38,6 +38,7 @@ public class GmailApiRequests implements ApiRequests {
                 .execute();
 
         while (response.getMessages() != null) {
+            assert messages != null;
             messages.addAll(response.getMessages());
             if (response.getNextPageToken() != null) {
                 String pageToken = response.getNextPageToken();
@@ -60,6 +61,7 @@ public class GmailApiRequests implements ApiRequests {
         int endPosition = startPosition + 10;
 
         List<Message> messagesLinks = getListByQuery(query);
+        assert messagesLinks != null;
         if (messagesLinks.size() == 0) {
             return;
         }
@@ -123,12 +125,12 @@ public class GmailApiRequests implements ApiRequests {
     @Override
     public void modifyMessage(Gmail service, String messageId, String userId) throws IOException {
         ModifyMessageRequest messageRequest = new ModifyMessageRequest();
-        messageRequest.setRemoveLabelIds(Arrays.asList("UNREAD"));
+        messageRequest.setRemoveLabelIds(Collections.singletonList("UNREAD"));
         service.users().messages().modify(userId, messageId, messageRequest).execute();
     }
 
     //Constructs Message from MimeMessage
-    public static Message makeMessageFromMimeMessage(MimeMessage email)
+    private static Message makeMessageFromMimeMessage(MimeMessage email)
             throws IOException, MessagingException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         email.writeTo(buffer);

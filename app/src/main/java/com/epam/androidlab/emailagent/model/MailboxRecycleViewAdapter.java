@@ -23,7 +23,7 @@ public class MailboxRecycleViewAdapter
 
     private AdapterUtils helper;
     private View view;
-    public static OnMailSelectedListener listener;
+    private static OnMailSelectedListener listener;
 
     public MailboxRecycleViewAdapter(FragmentActivity activity, List<Message> messages) {
         this.messages = messages;

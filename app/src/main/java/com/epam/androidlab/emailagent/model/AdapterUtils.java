@@ -26,7 +26,7 @@ public class AdapterUtils {
     private final String TRASH_TAG = "TRASH";
     private final String RECEIVER = "To";
     private final String MAILER = "From";
-    private Context context;
+    private final Context context;
 
     public AdapterUtils(Context context) {
         this.context = context;
@@ -65,7 +65,7 @@ public class AdapterUtils {
                 formatCardText(subject);
     }
 
-    public boolean isMailer(Message message) {
+    private boolean isMailer(Message message) {
         for (String labelId : message.getLabelIds()) {
             if (INBOX_TAG.equalsIgnoreCase(labelId) || TRASH_TAG.equals(labelId)) {
                 return true;

@@ -23,11 +23,11 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
     private final MimeMessage mimeMessage;
     private final String messageId;
 
-    private com.google.api.services.gmail.Gmail service;
-    public OnDataChangedListener onDataChangedListener;
-    private ApiRequests apiRequests;
-    private List<Message> messages;
-    private List<String> query;
+    private final com.google.api.services.gmail.Gmail service;
+    private final OnDataChangedListener onDataChangedListener;
+    private final ApiRequests apiRequests;
+    private final List<Message> messages;
+    private final List<String> query;
     private RequestType request;
 
     public RequestHandler(ApiRequests apiRequests,
@@ -63,9 +63,7 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
         request = (RequestType) params[0];
         try {
             handleRequest(params);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (MessagingException e) {
+        } catch (IOException | MessagingException e) {
             e.printStackTrace();
         }
         return null;

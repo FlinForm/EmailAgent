@@ -9,23 +9,16 @@ import com.epam.androidlab.emailagent.fragments.MailboxFragment;
 import com.epam.androidlab.emailagent.model.Mailbox;
 import com.epam.androidlab.emailagent.model.MailboxIdentifiers;
 import com.epam.androidlab.emailagent.model.MailboxRecycleViewAdapter;
-import com.epam.androidlab.emailagent.services.MessageReceiver;
 import com.epam.androidlab.emailagent.services.MessagingService;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.WatchRequest;
 
 import android.Manifest;
 import android.accounts.AccountManager;
-import android.app.AlarmManager;
 import android.app.Dialog;
-import android.app.PendingIntent;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.NavigationView;
@@ -41,8 +34,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
@@ -101,33 +92,11 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-
-        WatchRequest request = new WatchRequest();
-        List<String> labels = new ArrayList<>();
-        labels.add("INBOX");
-        request.setLabelIds(labels);
-        request.setTopicName("projects/virtual-plexus-169911/topics/mytopic");
-        try {
-            Gmail.Users.Watch w = GmailApiHelper.gmailService.users().watch("me", request);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -203,11 +172,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         MenuItem item = menu.findItem(R.id.toolbarTitle);
@@ -244,7 +208,7 @@ public class MainActivity extends AppCompatActivity
         } else if (GmailApiHelper.credential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (!GmailApiHelper.isDeviceOnline(this)) {
-            Snackbar.make(getCurrentFocus(),
+            Snackbar.make(getWindow().getDecorView(),
                     getString(R.string.no_connection),
                     BaseTransientBottomBar.LENGTH_LONG).show();
         } else {
@@ -284,7 +248,7 @@ public class MainActivity extends AppCompatActivity
         switch(requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
-                    Snackbar.make(getCurrentFocus(),
+                    Snackbar.make(getWindow().getDecorView(),
                             R.string.no_services_found,
                             BaseTransientBottomBar.LENGTH_LONG).show();
                 } else {
@@ -344,7 +308,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    void showGooglePlayServicesAvailabilityErrorDialog(
+    private void showGooglePlayServicesAvailabilityErrorDialog(
             final int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         Dialog dialog = apiAvailability.getErrorDialog(
@@ -352,18 +316,5 @@ public class MainActivity extends AppCompatActivity
                 connectionStatusCode,
                 REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
-    }
-
-    private void startEmailService() {
-        AlarmManager alarmManager;
-        PendingIntent pendingIntent;
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, MessageReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0,
-                intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis(),
-                5000,
-                pendingIntent);
     }
 }

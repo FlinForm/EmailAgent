@@ -39,7 +39,7 @@ public class MailboxFragment extends Fragment
     private final String MAILER = "From";
     private Uri MAILBOX_URI;
 
-    private String MAILBOX_IDENTIFIER_TAG = "identifier";
+    private final String MAILBOX_IDENTIFIER_TAG = "identifier";
     private MailboxIdentifiers mailboxIdentifier;
     private List<Message> messages;
     private RecyclerView recyclerView;
@@ -94,8 +94,6 @@ public class MailboxFragment extends Fragment
                     null,
                     null,
                     this).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
-        } else {
-
         }
 
         View fab = view.findViewById(R.id.recycleFab);
@@ -103,11 +101,6 @@ public class MailboxFragment extends Fragment
             Intent intent = new Intent(getContext(), NewEmailActivity.class);
             startActivity(intent);
         });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -150,10 +143,6 @@ public class MailboxFragment extends Fragment
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         List<Message> messageReferences = getMailboxByIdentifier();
-        if (messages.size() == messageReferences.size()) {
-            /*messages.remove(messages.size() - 1);
-            recyclerView.getAdapter().notifyItemRemoved(messages.size() - 1);*/
-        }
          if (messages.size() < messageReferences.size()) {
             if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == messages.size() - 1) {
                 if (GmailApiHelper.isDeviceOnline(getContext())) {

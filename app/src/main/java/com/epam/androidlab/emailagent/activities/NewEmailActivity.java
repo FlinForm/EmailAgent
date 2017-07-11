@@ -112,7 +112,7 @@ public class NewEmailActivity extends AppCompatActivity {
     //Forms new email message and sends it.
     private void sendNewEmail() {
         if ("".equals(receiver.getText().toString())) {
-            Snackbar.make(getCurrentFocus(),
+            Snackbar.make(getWindow().getDecorView(),
                     R.string.email_address_warning, BaseTransientBottomBar.LENGTH_LONG).show();
             return;
         }

@@ -185,7 +185,7 @@ public class LetterContentActivity extends AppCompatActivity {
         Display display =
                 ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int width = display.getWidth();
-        Double val = new Double(width)/new Double(500);
+        Double val = (double) width / 500d;
         val = val * 100d;
         return val.intValue();
     }
