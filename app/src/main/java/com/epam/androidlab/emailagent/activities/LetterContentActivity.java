@@ -42,6 +42,8 @@ public class LetterContentActivity extends AppCompatActivity {
     private final String TEXT_CALENDAR = "text/calendar";
     private final String MULTIPART_SIGNED = "multipart/signed";
     private final String MULTIPART_RELATED = "multipart/related";
+
+    private final String DEFAULT_FONTS_PATH = "fonts/Marmelad-Regular.ttf";
     private WebView webView;
 
     @Override
@@ -53,7 +55,7 @@ public class LetterContentActivity extends AppCompatActivity {
                 .execute(RequestType.MODIFY_MESSAGE);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
+                .setDefaultFontPath(DEFAULT_FONTS_PATH)
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 

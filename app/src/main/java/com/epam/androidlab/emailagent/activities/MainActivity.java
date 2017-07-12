@@ -51,11 +51,12 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     private static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
+    private static final String PREF_ACCOUNT_NAME = "accountName";
+
+    private final String DEFAULT_FONTS_PATH = "fonts/Marmelad-Regular.ttf";
     private final String MAILBOX_IDENTIFIER_TAG = "identifier";
 
     private String MENU_TITLE;
-
-    private static final String PREF_ACCOUNT_NAME = "accountName";
 
     private FragmentTransaction transaction;
     private DrawerLayout drawerLayout;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
+                .setDefaultFontPath(DEFAULT_FONTS_PATH)
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 

@@ -34,6 +34,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
  */
 
 public class NewEmailActivity extends AppCompatActivity {
+    private final String DEFAULT_FONTS_PATH = "fonts/Marmelad-Regular.ttf";
     private final int REQUEST_CODE = 13;
 
     private LinearLayout layout;
@@ -56,7 +57,7 @@ public class NewEmailActivity extends AppCompatActivity {
         emailBody = (EditText) findViewById(R.id.emailBody);
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/Marmelad-Regular.ttf")
+                .setDefaultFontPath(DEFAULT_FONTS_PATH)
                 .setFontAttrId(R.attr.fontPath)
                 .build());
     }
