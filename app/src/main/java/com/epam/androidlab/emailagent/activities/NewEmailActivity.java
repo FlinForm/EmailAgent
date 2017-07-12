@@ -30,7 +30,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 /**
  * This activity provides content to create new letter.
  * Here we need to fill 3 fields to send letter: email body, receiver and letter subject.
- * Also user can attach a file to his letter.
+ * Also user can attach file to his letter.
  */
 
 public class NewEmailActivity extends AppCompatActivity {
@@ -63,8 +63,7 @@ public class NewEmailActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 13) {
+        if (resultCode == REQUEST_CODE) {
             attachFile(data);
         }
     }
