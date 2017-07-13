@@ -37,14 +37,16 @@ public class MailboxFragment extends Fragment
     private final String SENDER = "sender";
     private final String SUBJECT = "Subject";
     private final String MAILER = "From";
-    private Uri MAILBOX_URI;
 
     private final String MAILBOX_IDENTIFIER_TAG = "identifier";
+
+    private Uri MAILBOX_URI;
     private MailboxIdentifiers mailboxIdentifier;
     private List<Message> messages;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
     private ProgressBar progressBar, recyclerProgressBar;
+    private boolean isRecycleViewFilled;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -143,15 +145,21 @@ public class MailboxFragment extends Fragment
     @Override
     public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
         List<Message> messageReferences = getMailboxByIdentifier();
-         if (messages.size() < messageReferences.size()) {
-            if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == messages.size() - 1) {
-                if (GmailApiHelper.isDeviceOnline(getContext())) {
-                    new RequestHandler(new GmailApiRequests(),
-                            messages,
-                            null,
-                            null,
-                            this).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
+        if (!isRecycleViewFilled) {
+            if (messages.size() < messageReferences.size()) {
+                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == messages.size() - 1) {
+                    if (GmailApiHelper.isDeviceOnline(getContext())) {
+                        new RequestHandler(new GmailApiRequests(),
+                                messages,
+                                null,
+                                null,
+                                this).execute(RequestType.BATCH_REQUEST, mailboxIdentifier);
+                    }
                 }
+            } else {
+                isRecycleViewFilled = true;
+                messages.remove(null);
+                recyclerView.getAdapter().notifyDataSetChanged();
             }
         }
     }

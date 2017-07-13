@@ -25,9 +25,9 @@ public class MessagingService extends Service {
     private void doTask() {
         new Thread(() -> {
             while (true) {
-                System.out.println(1);
+                System.out.println("Service is called!");
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(50000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
