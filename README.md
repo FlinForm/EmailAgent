@@ -27,3 +27,12 @@ WebView,
 
 Snackbar and other.
 
+
+A few words about applciation:
+
+This Email client has 5 types of mailboxes: Unread, Inbox, Outbox, Drafts and Trash, where
+you can find email letters, stored on your Gmail mailbox. When you want to see the content
+of concrete email letter - just tap on it and you will see it's content in seperate window. 
+If you want to write a new letter to your friend, the only thing you need is to tap on 
+Floating action button and to fill fields in opened window. There, you can also attach files
+or images if you want.
