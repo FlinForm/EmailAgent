@@ -29,6 +29,11 @@ import com.google.api.services.gmail.model.Message;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The instance of this fragment is created, when we
+ * select one 5 mailboxes in Navigation view.
+ */
+
 public class MailboxFragment extends Fragment
         implements View.OnScrollChangeListener, RequestHandler.OnDataChangedListener {
     private final String PROVIDER_URI = "content://com.epam.androidlab.emailagent.provider/";
@@ -45,7 +50,7 @@ public class MailboxFragment extends Fragment
     private List<Message> messages;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
-    private ProgressBar progressBar, recyclerProgressBar;
+    private ProgressBar progressBar;
     private boolean isRecycleViewFilled;
 
     @Override
@@ -74,7 +79,6 @@ public class MailboxFragment extends Fragment
         MAILBOX_URI = Uri.parse(PROVIDER_URI + mailboxIdentifier.toString().toLowerCase());
 
         progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
-        recyclerProgressBar = (ProgressBar) view.findViewById(R.id.progressBarRecycle);
 
         messages = new ArrayList<>();
         linearLayoutManager = new LinearLayoutManager(getContext());

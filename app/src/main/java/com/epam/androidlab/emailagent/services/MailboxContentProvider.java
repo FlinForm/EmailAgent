@@ -12,6 +12,11 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+/**
+ * This class is used to save uploaded messages and
+ * to use them in future when user device is offline.
+ */
+
 public class MailboxContentProvider extends ContentProvider {
     private static final String DB_NAME = "mailboxes";
     private static final int DB_VERSION = 1;

@@ -69,6 +69,7 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
         return null;
     }
 
+    // The main method, that handles requests.
     private void handleRequest(Object... params) throws IOException, MessagingException {
         query.clear();
         switch (request) {
