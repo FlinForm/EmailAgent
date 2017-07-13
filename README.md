@@ -21,6 +21,10 @@ CardView,
 
 DrawerLayout,
 
+NavigationView,
+
+Toolbar,
+
 Floating action button,
 
 WebView,
