@@ -13,11 +13,17 @@ padding, colors etc.
 
 Also I have used such elements of Material Design Library as:
 
-Android meterial pallete and icons
-RecyclerView
-CardView
-DrawerLayout
-Floating action button 
-WebView 
+Android meterial pallete and icons,
+
+RecyclerView,
+
+CardView,
+
+DrawerLayout,
+
+Floating action button,
+
+WebView,
+
 Snackbar and other.
 
