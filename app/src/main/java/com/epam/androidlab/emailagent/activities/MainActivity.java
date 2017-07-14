@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity
                 .setFontAttrId(R.attr.fontPath)
                 .build());
 
-        startService(new Intent(this, MessagingService.class));
+        //startService(new Intent(this, MessagingService.class));
 
         progressBar = (ProgressBar) findViewById(R.id.activityProgressBar);
         progressBar.setVisibility(View.INVISIBLE);
@@ -156,7 +156,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.unread_messages:
                 MENU_TITLE = getString(R.string.unread_messages);
-                item.setTitle(getString(R.string.unread_messages));
                 invalidateOptionsMenu();
                 Fragment unreadFragment = new MailboxFragment();
                 bundle.putString(MAILBOX_IDENTIFIER_TAG, MailboxIdentifiers.UNREAD.toString());

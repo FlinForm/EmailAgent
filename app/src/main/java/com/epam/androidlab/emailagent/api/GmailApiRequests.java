@@ -21,7 +21,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 /**
- * Its and implementation of ApiRequests, using gmail API.
+ * Its an implementation of ApiRequests, using gmail API.
  */
 
 public class GmailApiRequests implements ApiRequests {
@@ -31,6 +31,7 @@ public class GmailApiRequests implements ApiRequests {
     public void getMessageReferences(Gmail service, String userId, List<String> queries)
             throws IOException {
         List<Message> messages = getListByQuery(queries.get(0));
+        messages.clear();
         ListMessagesResponse response = service.users()
                 .messages()
                 .list(userId)

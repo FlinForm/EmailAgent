@@ -7,5 +7,5 @@ public enum RequestType {
     DELETE_MESSAGE,
     GET_ALL_REFERENCES,
     MODIFY_MESSAGE,
-    GET_RAW_MESSAGE
+    REFRESH_REFERENCES
 }

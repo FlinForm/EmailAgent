@@ -114,10 +114,14 @@ public class RequestHandler extends AsyncTask<Object, Void, Void> {
                     Mailbox.getUnRead().remove(message);
                 }
                 break;
-            case GET_RAW_MESSAGE:
-                Mailbox.setRawMessage(apiRequests
-                        .getRawMessage(service, myId, Mailbox.getMessage().getId()));
-                break;
+            case REFRESH_REFERENCES:
+                if (params.length != 0) {
+                    query.clear();
+                    query.add(params[1].toString());
+                    apiRequests.getMessageReferences(service, myId, query);
+                    apiRequests.batchRequest(service, myId, messages, params[1].toString());
+                    query.clear();
+                }
         }
     }
 

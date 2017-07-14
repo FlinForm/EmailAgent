@@ -65,7 +65,6 @@ public class NewEmailActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != 0) {
-            System.out.println("attached");
             attachFile(data);
         }
     }

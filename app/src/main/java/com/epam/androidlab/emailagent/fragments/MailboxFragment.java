@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,13 +51,13 @@ public class MailboxFragment extends Fragment
     private List<Message> messages;
     private RecyclerView recyclerView;
     private LinearLayoutManager linearLayoutManager;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
     private boolean isRecycleViewFilled;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
     }
 
     @Nullable
@@ -81,6 +82,9 @@ public class MailboxFragment extends Fragment
         progressBar = (ProgressBar) view.findViewById(R.id.fragmentProgressBar);
 
         messages = new ArrayList<>();
+
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
+        swipeRefreshLayout.setOnRefreshListener(() -> refreshContent());
         linearLayoutManager = new LinearLayoutManager(getContext());
 
         MailboxRecycleViewAdapter adapter = new MailboxRecycleViewAdapter(getActivity(), messages);
@@ -111,8 +115,12 @@ public class MailboxFragment extends Fragment
 
     @Override
     public void onDataChanged() {
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
         if (progressBar.getVisibility() == View.VISIBLE) {
             progressBar.setVisibility(View.INVISIBLE);
+            System.out.println("pb is visible");
         }
         while (messages.contains(null)){
             messages.remove(null);
@@ -166,6 +174,12 @@ public class MailboxFragment extends Fragment
                 recyclerView.getAdapter().notifyDataSetChanged();
             }
         }
+    }
+
+    private void refreshContent() {
+        new RequestHandler(new GmailApiRequests(), messages, null, null, this)
+                .execute(RequestType.REFRESH_REFERENCES, mailboxIdentifier);
+        messages.clear();
     }
 
     private List<Message> getMailboxByIdentifier() {
